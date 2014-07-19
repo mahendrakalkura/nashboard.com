@@ -17,7 +17,7 @@ Step 2:
 $ mkvirtualenv nashboard.com
 $ workon nashboard.com
 $ pip install -r requirements.txt
-$ cp settings.py.sample settings.py # Line 10
+$ cp settings.py.sample settings.py
 $ deactivate
 ```
 
