@@ -23,7 +23,7 @@ application.jinja_env.add_extension('jinja2.ext.with_')
 application.register_blueprint(
     administrators.blueprint, url_prefix='/administrators'
 )
-application.register_blueprint(others.blueprint, url_prefix='/visitors')
+application.register_blueprint(others.blueprint, url_prefix='/others')
 application.register_blueprint(visitors.blueprint)
 
 

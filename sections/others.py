@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from os import spawnl, P_NOWAIT
+
 from flask import Blueprint, render_template
 
 blueprint = Blueprint('others', __name__)
@@ -13,3 +15,9 @@ def errors_404(error=None):
 @blueprint.route('/500')
 def errors_500(error=None):
     return render_template('others/views/500.html'), 500
+
+
+@blueprint.route('/deploy', methods=['POST'])
+def deploy():
+    spawnl(P_NOWAIT, *['/bin/bash', '/home/ubuntu/nashboard.com/deploy.sh'])
+    return ''
