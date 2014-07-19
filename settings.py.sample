@@ -20,8 +20,8 @@ SQLALCHEMY = (
     'mysql+mysqldb://%(username)s:%(password)s@%(hostname)s/%(database)s?'
     'charset=utf8&use_unicode=1'
 ) % {
-    'database': 'nashboard.com',
-    'hostname': 'localhost',
-    'password': 'jMFKf4XAAxQzBchH',
-    'username': 'root',
+    'database': '',
+    'hostname': '',
+    'password': '',
+    'username': '',
 }
