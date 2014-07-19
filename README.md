@@ -29,6 +29,14 @@ $ npm install -g bower
 $ bower install
 ```
 
+Step 4:
+-------
+
+```
+mysql nashboard.com < files/0.sql
+mysql nashboard.com < files/1.sql
+```
+
 Assets
 ======
 
