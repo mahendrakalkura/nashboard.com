@@ -1,0 +1,182 @@
+{% macro flash() %}
+    {% with items = get_flashed_messages(with_categories=true) %}
+        {% for key, value in items %}
+            <div class="row">
+                <div class="col-lg-12 col-md-12">
+                    <div class="alert alert-{{ key }}">
+                        {% set class = '' %}
+                        {% if key == 'danger' %}
+                            {% set class = 'fa-times-circle' %}
+                        {% endif %}
+                        {% if key == 'info' %}
+                            {% set class = 'fa-info-circle' %}
+                        {% endif %}
+                        {% if key == 'success' %}
+                            {% set class = 'fa-check-square' %}
+                        {% endif %}
+                        {% if key == 'warning' %}
+                            {% set class = 'fa-exclamation-triangle' %}
+                        {% endif %}
+                        <i class="fa fa-fw {{ class }}"></i>
+                        {{ value }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endwith %}
+{% endmacro %}
+
+{% macro form(form) %}
+    {% for field in form %}
+        {% if not field.type in ['CSRFTokenField', 'HiddenField'] %}
+            {{ widget(field, class=class, **kwargs) }}
+        {% endif %}
+    {% endfor %}
+    {{ form.hidden_tag() }}
+{% endmacro %}
+
+{% macro pagination(route, pager) %}
+    <div class="pagination_">
+        <span class="pull-left">
+            <ul class="pagination">
+                <li class="{{ 'disabled' if pager.page == 1 else '' }}">
+                    <a href="{{ url_for(
+                        route['name'], page=1, **route['options']
+                    ) }}">
+                        <span>&laquo;</span>
+                    </a>
+                </li>
+                <li class="{{ 'disabled' if pager.page == 1 else '' }}">
+                    <a href="{{ url_for(
+                        route['name'], page=pager.previous, **route['options']
+                    ) }}">
+                        <span>&lt;</span>
+                    </a>
+                </li>
+                {% for page in pager.get_pages(2) %}
+                    <li class="{{ 'active' if page == pager.page else '' }}">
+                        <a href="{{ url_for(
+                            route['name'], page=page, **route['options']
+                        ) }}">
+                            <span>{{ page|format_integer }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+                <li class="{{
+                    'disabled'
+                    if pager.page == pager.pages
+                    else ''
+                }}">
+                    <a href="{{ url_for(
+                        route['name'], page=pager.next, **route['options']
+                    ) }}">
+                        <span>&gt;</span>
+                    </a>
+                </li>
+                <li class="{{
+                    'disabled'
+                    if pager.page == pager.pages
+                    else ''
+                }}">
+                    <a href="{{ url_for(
+                        route['name'], page=pager.pages, **route['options']
+                    ) }}">
+                        <span>&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </span>
+        <span class="pull-right">
+            Per Page
+            <ul class="pagination">
+                {% for limit in [10, 20, 30, 40, 50] %}
+                    <li class="{{ 'active' if limit == pager.limit else '' }}">
+                        <a href="{{ url_for(
+                            route['name'], limit=limit, **route['options']
+                        ) }}">
+                            <span>{{ limit }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </span>
+        Showing
+        {{ pager.first|format_integer }}
+        to
+        {{ pager.last|format_integer }}
+        of
+        {{ pager.count|format_integer }}
+        items
+    </div>
+{% endmacro %}
+
+{% macro th(route, order_by, key, value, class) %}
+    {% set direction = (
+        'desc'
+        if order_by['direction'] == 'asc'
+        else 'asc'
+        if order_by['column'] == key
+        else 'asc'
+    ) %}
+    <th class="{{ class }} {{ 'sort' if order_by['column'] == key else '' }}">
+        <a href="{{ url_for(
+            route['name'],
+            order_by_column=key,
+            order_by_direction=direction,
+            **route['options']
+        ) }}">
+            {{ value }}
+        </a>
+        {% if order_by['column'] == key %}
+            <i class="fa fa-fw {{
+                'fa-sort-alpha-asc'
+                if direction == 'asc'
+                else 'fa-sort-alpha-desc'
+            }}">
+            </i>
+        {% endif %}
+    </th>
+{% endmacro %}
+
+{% macro widget(field) %}
+    {% set class = [] %}
+    {% if field.flags.required %}
+        {% do class.append('required') %}
+    {% endif %}
+    {% if field.errors|length %}
+        {% do class.append('has-error') %}
+    {% endif %}
+    <div class="form-group {{ class|join(' ') }}">
+        <label
+            class="col-lg-2 col-md-2 control-label"
+            for="{{ field.label.field_id}}"
+            >{{ field.label.text }}</label>
+        <div class="col-lg-10 col-md-10">
+            {% set class = [] %}
+            {% if 'class' in kwargs and kwargs['class'] %}
+                {% do class.append(kwargs['class']) %}
+            {% endif %}
+            {% do class.append('col-lg-10') %}
+            {% do class.append('col-md-10') %}
+            {% do class.append('form-control') %}
+            {% do kwargs.update(class=class|join(' ')) %}
+            {% if field.type == 'wysihtml5' %}
+                {{ field(wysihtml5=true, **kwargs)|safe }}
+            {% else %}
+                {{ field(**kwargs)|safe }}
+            {% endif %}
+            {% if field.description %}
+                {% for line in field.description %}
+                    <span class="help-block">
+                        <i class="fa fa-fw fa-info-circle"></i> {{ line }}
+                     </span>
+                {% endfor %}
+            {% endif %}
+            {% for error in field.errors %}
+                <span class="help-block">
+                    <i class="fa fa-fw fa-times-circle"></i> {{ error }}
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}

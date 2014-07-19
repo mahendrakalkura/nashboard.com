@@ -1,0 +1,132 @@
+{% import 'macros.html' as macros with context %}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <link
+            href="{{ url_for('static', filename='images/favicon.ico') }}"
+            rel="shortcut icon"
+            >
+        <meta charset="utf-8">
+        <title>{{ title }} - NAS#BOARD</title>
+        {% assets "stylesheets" %}
+            <link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">
+        {% endassets %}
+    </head>
+    <body
+        class="administrators"
+        data-background="{{ url_for('static', filename='images/body.png') }}"
+        >
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12">
+                    {% if g.administrator %}
+                        <div class="dropdown pull-right" id="shortcuts">
+                            <strong
+                                class="dropdown-toggle"
+                                data-toggle="dropdown"
+                                >
+                                <i class="fa fa-fw fa-user-md"></i>
+                                Administrator
+                                <i class="caret"></i>
+                            </strong>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{{ url_for(
+                                        'administrators.dashboard'
+                                    ) }}">
+                                        <i class="fa fa-fw fa-home"></i>
+                                        Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for(
+                                        'administrators.profile'
+                                    ) }}">
+                                        <i class="fa fa-fw fa-cog"></i>
+                                        Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for(
+                                        'administrators.sign_out'
+                                    ) }}">
+                                        <i class="fa fa-fw fa-sign-out"></i>
+                                        Sign Out
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <div id="logo">
+                        <a href="{{ url_for('administrators.dashboard') }}">
+                            NAS#BOARD
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12">
+                    <nav class="navbar navbar-default">
+                        <div class="navbar-header">
+                            <ul class="nav navbar-nav">
+                                {% if g.administrator %}
+                                    <li class="{{
+                                        'active'
+                                        if navbar == 'categories'
+                                        else ''
+                                    }}">
+                                        <a href="{{ url_for(
+                                            'administrators.categories_overview'
+                                        ) }}">
+                                            <i class="fa fa-fw fa-language"></i>
+                                            Categories
+                                        </a>
+                                    </li>
+                                    <li class="{{
+                                        'active'
+                                        if navbar == 'handles'
+                                        else ''
+                                    }}">
+                                        <a href="{{ url_for(
+                                            'administrators.handles_overview'
+                                        ) }}">
+                                            <i class="fa fa-fw fa-slack"></i>
+                                            Handles
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="{{
+                                        'active' if navbar == 'sign_in' else ''
+                                    }}">
+                                        <a href="{{ url_for(
+                                            'administrators.sign_in'
+                                        ) }}">
+                                            <i class="fa fa-fw fa-sign-in">
+                                            </i>
+                                            Sign In
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            {{ macros.flash() }}
+            {% block component %}
+            {% endblock %}
+            <div class="row">
+                <div class="col-lg-12 col-md-12">
+                    <hr>
+                    <p class="text-right">
+                        &copy; {{ g.year }} - All Rights Reserved
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% assets "javascripts" %}
+            <script src="{{ ASSET_URL }}" type="text/javascript"></script>
+        {% endassets %}
+    </body>
+</html>

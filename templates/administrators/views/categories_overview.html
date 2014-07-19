@@ -1,0 +1,141 @@
+{% extends 'administrators/layout.html' %}
+
+{% set navbar = 'categories' %}
+{% set title = 'Categories - Overview' %}
+
+{% block component %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="page-header">
+                <a
+                    class="btn btn-success pull-right"
+                    href="{{ url_for('administrators.categories_add') }}"
+                    >
+                    <span class="fa fa-fw fa-plus-circle"></span>
+                    Add
+                </a>
+                <h1>
+                    <i class="fa fa-fw fa-map-marker"></i>
+                    {{ title }}
+                </h1>
+            </div>
+            {% if categories %}
+                <form
+                    action="{{ url_for('administrators.categories_process') }}"
+                    method="post"
+                    >
+                    <table class="table table-hover table-striped">
+                        <tr>
+                            <th class="narrow text-center">
+                                <input type="checkbox">
+                            </th>
+                            <th class="narrow text-right">ID</th>
+                            <th>Name</th>
+                            <th class="narrow text-right">Handles</th>
+                            <th class="narrow text-right">Tweets</th>
+                            <th class="narrow text-center">Position</th>
+                            <th class="actions narrow">Actions</th>
+                        </tr>
+                        {% for category in categories %}
+                            <tr>
+                                <td class="narrow text center">
+                                    <input
+                                        name="ids"
+                                        type="checkbox"
+                                        value="{{ category.id }}"
+                                        >
+                                </td>
+                                <td class="narrow text-center">
+                                    {{ category.id }}
+                                </td>
+                                <td>
+                                    <a
+                                        href="{{ url_for('visitors.dashboard') }}#{{ category.id }}"
+                                        target="_blank"
+                                        >
+                                        {{ category.name }}
+                                    </a>
+                                </td>
+                                <td class="narrow text-right">
+                                    {{ category.handles.count()|format_integer }}
+                                </td>
+                                <td class="narrow text-right">
+                                    {{ category.get_tweets()|format_integer }}
+                                </td>
+                                <td class="actions narrow">
+                                    <a
+                                        class="btn btn-xs btn-info"
+                                        href="{{ url_for(
+                                            'administrators.categories_position',
+                                            id=category.id,
+                                            direction='up',
+                                        ) }}"
+                                        {% if loop.first %}
+                                            style="visibility: hidden"
+                                        {% endif %}
+                                        >
+                                        <i class="fa fa-fw fa-arrow-up lone">
+                                        </i>
+                                    </a>
+                                    <a
+                                        class="btn btn-xs btn-info"
+                                        href="{{ url_for(
+                                            'administrators.categories_position',
+                                            id=category.id,
+                                            direction='down',
+                                        ) }}"
+                                        {% if loop.last %}
+                                            style="visibility: hidden"
+                                        {% endif %}
+                                        >
+                                        <i class="fa fa-fw fa-arrow-down lone">
+                                        </i>
+                                    </a>
+                                </td>
+                                <td class="actions narrow">
+                                    <a
+                                        class="btn btn-xs btn-success"
+                                        href="{{ url_for(
+                                            'administrators.categories_edit',
+                                            id=category.id
+                                        ) }}"
+                                        >
+                                        <i class="fa fa-fw fa-pencil"></i>
+                                        Edit
+                                    </a>
+                                    <a
+                                        class="btn btn-xs btn-danger"
+                                        href="{{ url_for(
+                                            'administrators.categories_delete',
+                                            id=category.id
+                                        ) }}"
+                                        >
+                                        <i class="fa fa-fw fa-times-circle">
+                                        </i>
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <p>
+                        <button
+                            class="btn btn-danger"
+                            name="submit"
+                            type="submit"
+                            value="delete"
+                            >
+                            <i class="fa fa-fw fa-times-circle"></i>
+                            Delete
+                        </button>
+                    </p>
+                </form>
+            {% else %}
+                <div class="alert alert-danger">
+                    <i class="fa fa-fw fa-exclamation-triangle"></i>
+                    There are no categories in the database.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

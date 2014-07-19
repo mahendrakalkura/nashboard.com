@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+
+from datetime import timedelta
+
+# Flask
+
+DEBUG = False
+LOGGER_NAME = 'flask'
+MAX_CONTENT_LENGTH = None
+PERMANENT_SESSION_LIFETIME = timedelta(days=31)
+PROPAGATE_EXCEPTIONS = False
+SECRET_KEY = 'YOUCANTSEEME'
+SESSION_COOKIE_NAME = 'session'
+TESTING = False
+USE_X_SENDFILE = False
+
+# MySQL
+
+SQLALCHEMY = (
+    'mysql+mysqldb://%(username)s:%(password)s@%(hostname)s/%(database)s?'
+    'charset=utf8&use_unicode=1'
+) % {
+    'database': 'nashboard.com',
+    'hostname': 'localhost',
+    'password': 'jMFKf4XAAxQzBchH',
+    'username': 'root',
+}
