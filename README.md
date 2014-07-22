@@ -5,9 +5,8 @@ Step 1:
 -------
 
 ```
-$ mkdir nashboard.com
-$ cd nashboard.com
 $ git clone git@bitbucket.org:mahendrakalkura/nashboard.com.git .
+$ cd nashboard.com
 ```
 
 Step 2:
@@ -20,6 +19,7 @@ $ pip install -r requirements.txt
 $ cp settings.py.sample settings.py
 $ deactivate
 ```
+add local server configuration info into `settings.py`
 
 Step 3:
 -------
@@ -27,14 +27,17 @@ Step 3:
 ```
 $ npm install -g bower
 $ bower install
+$ npm install -g less
 ```
 
 Step 4:
 -------
 
 ```
-mysql nashboard.com < files/0.sql
-mysql nashboard.com < files/1.sql
+$ mysql
+mysql> create database nashboard;
+$ mysql nashboard < files/0.sql
+$ mysql nashboard < files/1.sql
 ```
 
 Assets
