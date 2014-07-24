@@ -106,11 +106,12 @@
         format('woff');
 }
 
-a {
+a, button {
     cursor: pointer;
     &.fa {
         text-decoration: none;
     }
+    transition: all 200ms ease-in-out;
 }
 
 body,
@@ -135,7 +136,6 @@ select,
 
 body {
     background-color: #ffffff;
-    padding: 20px;
     position: relative;
     &.administrators {
         .container {
@@ -162,6 +162,103 @@ body {
         }
     }
     &.visitors {
+        background-color: #3F5872;
+        header {
+            background: inherit;
+            padding-bottom: 10em;
+        }
+        nav {
+            background: inherit;
+            border: none;
+            box-shadow: none;
+            .container {
+                position: relative;
+            }
+            /* apply only when large screen */
+            @media (min-width: @screen-lg-min) {
+                .bottom {
+                    position: absolute;
+                    padding: 0 20px;
+                    bottom: 0;
+                    display: inline-block !important;
+                }
+            }
+            .top {
+                height: 1.5em;
+                font-size: 1.5em;
+                a {
+                    color: #AECAE4;
+                    margin: 5px;
+                    &:hover {
+                        color: #FF0;
+                    }
+                }
+                .btn {
+                    background: #427BAF;
+                    padding: 5px 10px;
+                    font-weight: bold;
+                    color: #FFF;
+                    &:hover {
+                        color: #FFF;
+                        background: #4A8CC9;
+                    }
+                }
+            }
+            .logo {
+                width: 200px;
+                height: 70px;
+                padding: 0;
+                margin: 10px;
+                font-size: 0;
+                background-size: contain;
+                background-repeat: no-repeat;
+                display: inline-block;
+            }
+            &.small {
+                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                .logo {
+                    width: 120px;
+                    height: 40px;
+                    margin: 5px 0;
+                }
+                .top {
+                    display: none;
+                }
+            }
+            .navbar-collapse {
+                border: none;
+                .navbar-nav li.active a {
+                    border: none;
+                    border-radius: 0;
+                }
+            }
+            .navbar-nav li {
+                a {
+                    background: none;
+                    box-shadow: none;
+                    color: #FFF;
+                    font-size: 1em;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                    text-shadow: none;
+                    &:hover {
+                        color: #FF0;
+                    }
+                    transition: all 200ms ease-in-out;
+                }
+                &.active a {
+                    background: none;
+                    box-shadow: none;
+                    color: #FFF;
+                    border-bottom: 5px solid;
+                    border-radius: 3px;
+                    &:hover {
+                        background: #567FBB;
+                        color: #FF0;
+                    }
+                }
+            }
+        }
         .alert {
             background-clip: padding-box;
             border-radius: 10px;
@@ -170,63 +267,8 @@ body {
             -o-border-radius: 10px;
             -webkit-border-radius: 10px;
         }
-        .navbar {
-            background-clip: padding-box;
-            background-color: #ffffff;
-            border: 0;
-            border-radius: 10px;
-            -moz-border-radius: 10px;
-            -ms-border-radius: 10px;
-            -o-border-radius: 10px;
-            -webkit-border-radius: 10px;
-            .navbar-header {
-                .nav {
-                    border-left: 1px solid #000000;
-                    margin: 0 20px;
-                    li {
-                        border-right: 1px solid #000000;
-                        &.active {
-                            a {
-                                background-clip: padding-box;
-                                background-color: #1e90ff;
-                                background-image: none;
-                                color: #ffffff;
-                                text-decoration: none;
-                            }
-                        }
-                        a {
-                            color: #000000;
-                            font-size: 16px;
-                            &:hover {
-                                background-clip: padding-box;
-                                background-color: #1e90ff;
-                                background-image: none;
-                                color: #ffffff;
-                                text-decoration: none;
-                            }
-                        }
-                    }
-                }
-            }
-        }
         .pull-right + .pull-right {
             margin-right: 20px;
-        }
-        #logo {
-            margin-bottom: 20px;
-            a {
-                color: #1e90ff;
-                display: inline-block;
-                font-size: 32px;
-                font-weight: bold;
-                line-height: 46px;
-                &:hover {
-                    text-decoration: none;
-                }
-                img {
-                    float: left;
-                }
-            }
         }
     }
 }
@@ -325,16 +367,11 @@ p {
     }
 }
 
+#tweets > div:nth-child(even) > .part {
+    float: right;
+}
 .tweet {
-    background-color: #ffffff;
-    border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    margin-bottom: 20px;
-    padding: 20px 20px 10px 20px;
-    position: relative;
+    margin-bottom: 2em;
     .created_at {
         position: absolute;
         right: 20px;
