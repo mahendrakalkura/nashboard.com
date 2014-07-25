@@ -65,7 +65,8 @@ jQuery(function () {
         );
     });
 
-    jQuery.backstretch(body.attr('data-background'));
+    if (!!body.attr('data-background'))
+        jQuery.backstretch(body.attr('data-background'));
 
     jQuery('.nav li a[data-id]').click(function () {
         jQuery('.tweet').remove();
@@ -82,4 +83,12 @@ jQuery(function () {
     } else {
         jQuery('.nav li a[data-id]:first').click();
     }
+    jQuery(window).scroll(function() {
+        var w = jQuery(window).scrollTop();
+        if (w >= jQuery('header nav').height())
+            jQuery('header nav').addClass('small');
+        else
+            jQuery('header nav').removeClass('small');
+    });
+
 });

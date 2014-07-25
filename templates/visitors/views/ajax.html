@@ -1,33 +1,37 @@
 <div id="tweets">
     {% for tweet in tweets %}
-        <div class="tweet" data-id="{{ tweet.id }}">
-            <a
-                class="handle_profile_image_url"
-                href="https://twitter.com/{{ tweet.handle_name }}"
-                target="_blank"
-                >
-                <img src="{{ tweet.handle_profile_image_url}}">
-            </a>
-            <a
-                class="handle_screen_name"
-                href="https://twitter.com/{{ tweet.handle_name }}"
-                target="_blank"
-                >{{ tweet.handle_screen_name }}</a>
-            <p class="created_at" title="{{ tweet.created_at }}">
-                {{ tweet.created_at }}
-            </p>
-            <p class="text">{{ tweet.text|safe }}</p>
-            {% if tweet.media %}
-                <p class="media text-center">
-                    <a
-                        data-lightbox="lightbox"
-                        href="{{ tweet.media }}"
-                        target="_blank"
-                        >
-                        <img src="{{ tweet.media }}">
-                    </a>
+        <div class="tweet row" data-id="{{ tweet.id }}">
+            <div class="col-sm-4 part info">
+                <a
+                    class="handle_profile_image_url"
+                    href="https://twitter.com/{{ tweet.handle_name }}"
+                    target="_blank"
+                    >
+                    <img src="{{ tweet.handle_profile_image_url}}">
+                </a>
+                <a
+                    class="handle_screen_name"
+                    href="https://twitter.com/{{ tweet.handle_name }}"
+                    target="_blank"
+                    >{{ tweet.handle_screen_name }}</a>
+                <p class="created_at" title="{{ tweet.created_at }}">
+                    {{ tweet.created_at }}
                 </p>
-            {% endif %}
+            </div>
+            <div class="col-sm-8 part body">
+                <p class="text">{{ tweet.text|safe }}</p>
+                {% if tweet.media %}
+                    <p class="media text-center">
+                        <a
+                            data-lightbox="lightbox"
+                            href="{{ tweet.media }}"
+                            target="_blank"
+                            >
+                            <img src="{{ tweet.media }}">
+                        </a>
+                    </p>
+                {% endif %}
+            </div>
         </div>
     {% endfor %}
 </div>
