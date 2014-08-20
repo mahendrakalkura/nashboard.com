@@ -108,11 +108,11 @@ def get_tweets(q):
                 headers=headers,
                 params=params,
                 proxies={
-                    'http': 'socks5://198.61.215.37:%(port)d' % {
-                        'port': (9050 + randint(1, 50)),
+                    'http': 'socks5://72.52.91.120:%(port)d' % {
+                        'port': (9050 + randint(1, 100)),
                     },
-                    'https': 'socks5://198.61.215.37:%(port)d' % {
-                        'port': (9050 + randint(1, 50)),
+                    'https': 'socks5://72.52.91.120:%(port)d' % {
+                        'port': (9050 + randint(1, 100)),
                     },
                 },
                 timeout=60.00
