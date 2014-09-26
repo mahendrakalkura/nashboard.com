@@ -3,6 +3,7 @@
 from contextlib import closing
 from datetime import datetime, timedelta
 from random import choice, randint
+from re import findall
 from urlparse import urlparse
 
 from furl import furl
@@ -204,7 +205,15 @@ def get_tweet(tweet):
         and
         id
         and
-        text
+        (
+            text
+            and
+            (
+                not text.startswith('http')
+                or
+                ' ' in text
+            )
+        )
         and
         user_name
         and

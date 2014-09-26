@@ -19,6 +19,10 @@ class category(database.base):
         'autoload': True,
     }
 
+    def __init__(self, *args, **kwargs):
+        super(category, self).__init__(*args, **kwargs)
+        self.ttl = '604800'
+
     def get_tweets(self):
         return g.mysql.query(
             tweet,

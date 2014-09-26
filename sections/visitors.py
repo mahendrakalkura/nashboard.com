@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from bleach import linkify
+from datetime import datetime, timedelta
 from flask import abort, Blueprint, g, render_template, request
 from pytz import utc
 
@@ -34,6 +35,7 @@ def ajax():
         models.category_handle,
     ).filter(
         models.category_handle.category == category,
+        models.tweet.created_at >= datetime.now() - timedelta(seconds=category.ttl),
     ).order_by('created_at desc'):
         if (
             category.name == 'Happy Hours'

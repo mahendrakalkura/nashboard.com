@@ -29,9 +29,22 @@ class categories_form(Form):
             validators.unique(table='categories', columns=[]),
         ],
     )
+    ttl = SelectField(
+        choices=[
+            ('86400', '1 day'),
+            ('259200', '3 days'),
+            ('604800', '7 days'),
+        ],
+        default='604800',
+        label='TTL',
+        validators=[
+            validators.required(),
+        ]
+    )
 
     def get_instance(self, category):
         category.name = self.name.data
+        category.ttl = self.ttl.data
         return category
 
 
