@@ -5,7 +5,7 @@ Step 1:
 -------
 
 ```
-$ git clone git@bitbucket.org:mahendrakalkura/nashboard.com.git .
+$ git clone git@bitbucket.org:bearcott/nashboard.com.git .
 $ cd nashboard.com
 ```
 
