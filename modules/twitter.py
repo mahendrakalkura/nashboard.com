@@ -3,7 +3,6 @@
 from contextlib import closing
 from datetime import datetime, timedelta
 from random import choice, randint
-from re import findall
 from urlparse import urlparse
 
 from furl import furl

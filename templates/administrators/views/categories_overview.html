@@ -31,6 +31,7 @@
                             </th>
                             <th class="narrow text-right">ID</th>
                             <th>Name</th>
+                            <th class="narrow">TTL</th>
                             <th class="narrow text-right">Handles</th>
                             <th class="narrow text-right">Tweets</th>
                             <th class="narrow text-center">Position</th>
@@ -55,6 +56,9 @@
                                         >
                                         {{ category.name }}
                                     </a>
+                                </td>
+                                <td class="narrow">
+                                    {{ category.get_ttl() }}
                                 </td>
                                 <td class="narrow text-right">
                                     {{ category.handles.count()|format_integer }}

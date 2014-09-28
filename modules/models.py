@@ -21,7 +21,13 @@ class category(database.base):
 
     def __init__(self, *args, **kwargs):
         super(category, self).__init__(*args, **kwargs)
-        self.ttl = '604800'
+        self.ttl = category.__table__.choices['ttl'][-1][0]
+
+    def get_ttl(self):
+        for key, value in category.__table__.choices['ttl']:
+            if key == self.ttl:
+                return value
+        return ''
 
     def get_tweets(self):
         return g.mysql.query(
@@ -64,6 +70,18 @@ class category(database.base):
             ).first()
             if instance:
                 swap(self, instance)
+
+category.__table__.choices = {
+    'ttl': [
+        (86400 * 1, '1 day'),
+        (86400 * 2, '2 days'),
+        (86400 * 3, '3 days'),
+        (86400 * 4, '4 days'),
+        (86400 * 5, '5 days'),
+        (86400 * 6, '6 days'),
+        (86400 * 7, '7 days'),
+    ],
+}
 
 
 class handle(database.base):

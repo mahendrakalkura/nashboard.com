@@ -30,12 +30,8 @@ class categories_form(Form):
         ],
     )
     ttl = SelectField(
-        choices=[
-            ('86400', '1 day'),
-            ('259200', '3 days'),
-            ('604800', '7 days'),
-        ],
-        default='604800',
+        choices=models.category.__table__.choices['ttl'],
+        coerce=int,
         label='TTL',
         validators=[
             validators.required(),
