@@ -3,6 +3,7 @@
 from contextlib import closing
 from datetime import datetime, timedelta
 from random import choice, randint
+from re import findall
 from urlparse import urlparse
 
 from furl import furl
@@ -199,6 +200,16 @@ def get_tweet(tweet):
         user_screen_name = tweet.xpath('.//@data-name').extract()[0]
     except ValueError:
         pass
+    if not media:
+        urls = findall(
+            r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'
+            '(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+            text
+        )
+        for url in urls:
+            if 'fbcdn' in url and ('hprofile' in url or 'hphotos' in url):
+                media = url
+                break
     if (
         created_at
         and
