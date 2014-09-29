@@ -3,7 +3,7 @@
 from contextlib import closing
 from datetime import datetime, timedelta
 from random import choice, randint
-from re import findall
+from re import findall, VERBOSE
 from urlparse import urlparse
 
 from furl import furl
@@ -201,12 +201,24 @@ def get_tweet(tweet):
     except ValueError:
         pass
     if not media:
-        urls = findall(
-            r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'
-            '(?:%[0-9a-fA-F][0-9a-fA-F]))+',
-            text
-        )
-        for url in urls:
+        for url in findall(
+            r'''
+            http[s]?://
+            (
+                ?:[a-zA-Z]
+                |
+                [0-9]
+                |
+                [$-_@.&+]
+                |
+                [!*\(\),]
+                |
+                (?:%[0-9a-fA-F][0-9a-fA-F])
+            )+
+            ''',
+            text,
+            VERBOSE
+        ):
             if 'fbcdn' in url and ('hprofile' in url or 'hphotos' in url):
                 media = url
                 break
