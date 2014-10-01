@@ -1,0 +1,126 @@
+{% extends 'administrators/layout.html' %}
+
+{% set navbar = 'neighborhoods' %}
+{% set title = 'Neighborhoods - Overview' %}
+
+{% block component %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="page-header">
+                <a
+                    class="btn btn-success pull-right"
+                    href="{{ url_for('administrators.neighborhoods_add') }}"
+                    >
+                    <span class="fa fa-fw fa-plus-circle"></span>
+                    Add
+                </a>
+                <h1>
+                    <i class="fa fa-fw fa-map-marker"></i>
+                    {{ title }}
+                </h1>
+            </div>
+            {% if neighborhoods %}
+                <form
+                    action="{{ url_for('administrators.neighborhoods_process') }}"
+                    method="post"
+                    >
+                    <table class="table table-hover table-striped">
+                        <tr>
+                            <th class="narrow text-center">
+                                <input type="checkbox">
+                            </th>
+                            <th class="narrow text-right">ID</th>
+                            <th>Name</th>
+                            <th class="narrow text-center">Position</th>
+                            <th class="actions narrow">Actions</th>
+                        </tr>
+                        {% for neighborhood in neighborhoods %}
+                            <tr>
+                                <td class="narrow text center">
+                                    <input
+                                        name="ids"
+                                        type="checkbox"
+                                        value="{{ neighborhood.id }}"
+                                        >
+                                </td>
+                                <td class="narrow text-center">
+                                    {{ neighborhood.id }}
+                                </td>
+                                <td>{{ neighborhood.name }}</td>
+                                <td class="actions narrow">
+                                    <a
+                                        class="btn btn-xs btn-info"
+                                        href="{{ url_for(
+                                            'administrators.neighborhoods_position',
+                                            id=neighborhood.id,
+                                            direction='up',
+                                        ) }}"
+                                        {% if loop.first %}
+                                            style="visibility: hidden"
+                                        {% endif %}
+                                        >
+                                        <i class="fa fa-fw fa-arrow-up lone">
+                                        </i>
+                                    </a>
+                                    <a
+                                        class="btn btn-xs btn-info"
+                                        href="{{ url_for(
+                                            'administrators.neighborhoods_position',
+                                            id=neighborhood.id,
+                                            direction='down',
+                                        ) }}"
+                                        {% if loop.last %}
+                                            style="visibility: hidden"
+                                        {% endif %}
+                                        >
+                                        <i class="fa fa-fw fa-arrow-down lone">
+                                        </i>
+                                    </a>
+                                </td>
+                                <td class="actions narrow">
+                                    <a
+                                        class="btn btn-xs btn-success"
+                                        href="{{ url_for(
+                                            'administrators.neighborhoods_edit',
+                                            id=neighborhood.id
+                                        ) }}"
+                                        >
+                                        <i class="fa fa-fw fa-pencil"></i>
+                                        Edit
+                                    </a>
+                                    <a
+                                        class="btn btn-xs btn-danger"
+                                        href="{{ url_for(
+                                            'administrators.neighborhoods_delete',
+                                            id=neighborhood.id
+                                        ) }}"
+                                        >
+                                        <i class="fa fa-fw fa-times-circle">
+                                        </i>
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <p>
+                        <button
+                            class="btn btn-danger"
+                            name="submit"
+                            type="submit"
+                            value="delete"
+                            >
+                            <i class="fa fa-fw fa-times-circle"></i>
+                            Delete
+                        </button>
+                    </p>
+                </form>
+            {% else %}
+                <div class="alert alert-danger">
+                    <i class="fa fa-fw fa-exclamation-triangle"></i>
+                    There are no neighborhoods in the database.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,9 +1,10 @@
 jQuery(function () {
     var body = jQuery('body');
+    var neighborhood_id = jQuery('.top [name="neighborhood_id"]');
     var timeout = null;
 
-    var ajax = function (id) {
-        window.location.hash = '#' + id;
+    var ajax = function (category_id) {
+        window.location.hash = '#' + category_id;
         var dashboard = jQuery('#dashboard');
         var tweets = dashboard.find('#tweets');
         var failure_1 = dashboard.find('#failure_1');
@@ -17,7 +18,8 @@ jQuery(function () {
         jQuery.ajax({
             cache: false,
             data: {
-                id: id
+                category_id: category_id,
+                neighborhood_id: neighborhood_id.val()
             },
             timeout: 30000,
             type: 'POST',
@@ -41,20 +43,20 @@ jQuery(function () {
                 if (!tweets.find('.tweet').length) {
                     failure_2.removeClass('hide');
                 }
-                refresh(id);
+                refresh(category_id);
             },
             function (jqXHR, textStatus, errorThrown) {
                 overlay.addClass('hide');
                 spinner.addClass('hide');
                 failure_1.removeClass('hide');
-                refresh(id);
+                refresh(category_id);
             }
         );
     };
 
-    var refresh = function (id) {
+    var refresh = function (category_id) {
         timeout = window.setTimeout(function () {
-            ajax(id);
+            ajax(category_id);
         }, 30000);
     };
 
@@ -67,10 +69,11 @@ jQuery(function () {
 
     jQuery(window).scroll(function() {
         var w = jQuery(window).scrollTop();
-        if (w >= jQuery('header nav').height())
+        if (w >= jQuery('header nav').height()) {
             jQuery('header nav').addClass('small');
-        else
+        } else {
             jQuery('header nav').removeClass('small');
+        }
     });
 
     if (!!body.attr('data-background')) {
@@ -88,11 +91,14 @@ jQuery(function () {
             return false;
         });
 
-        var id = window.location.hash.substr(1);
-        if (id.length) {
-            jQuery('.nav li a[data-id="' + id + '"]').click();
-        } else {
-            jQuery('.nav li a[data-id]:first').click();
-        }
+        jQuery('.top [name="neighborhood_id"]').change(function () {
+            var id = window.location.hash.substr(1);
+            if (id.length) {
+                jQuery('.nav li a[data-id="' + id + '"]').click();
+            } else {
+                jQuery('.nav li a[data-id]:first').click();
+            }
+            return false;
+        }).change();
     }
 });

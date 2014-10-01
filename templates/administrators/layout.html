@@ -85,6 +85,18 @@
                                     </li>
                                     <li class="{{
                                         'active'
+                                        if navbar == 'neighborhoods'
+                                        else ''
+                                    }}">
+                                        <a href="{{ url_for(
+                                            'administrators.neighborhoods_overview'
+                                        ) }}">
+                                            <i class="fa fa-fw fa-link"></i>
+                                            Neighborhoods
+                                        </a>
+                                    </li>
+                                    <li class="{{
+                                        'active'
                                         if navbar == 'handles'
                                         else ''
                                     }}">

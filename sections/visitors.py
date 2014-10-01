@@ -26,6 +26,9 @@ def before_request():
     g.categories = g.mysql.query(
         models.category,
     ).order_by('position asc').all()
+    g.neighborhoods = g.mysql.query(
+        models.neighborhood,
+    ).order_by('position asc').all()
 
 
 @blueprint.route('/')
@@ -35,12 +38,10 @@ def dashboard():
 
 @blueprint.route('/ajax', methods=['POST'])
 def ajax():
-    category = g.mysql.query(models.category).get(request.form['id'])
+    category = g.mysql.query(models.category).get(request.form['category_id'])
     if not category:
         abort(404)
-    counts = {}
-    tweets = []
-    for tweet in g.mysql.query(
+    query = g.mysql.query(
         models.tweet,
     ).join(
         models.handle,
@@ -48,8 +49,18 @@ def ajax():
         models.category_handle,
     ).filter(
         models.category_handle.category == category,
-        models.tweet.created_at >= datetime.now() - timedelta(seconds=category.ttl),
-    ).order_by('created_at desc'):
+        models.tweet.created_at
+        >=
+        datetime.now() - timedelta(seconds=category.ttl),
+    )
+    neighborhood = g.mysql.query(
+        models.neighborhood,
+    ).get(request.form['neighborhood_id'])
+    if neighborhood:
+        query = query.filter(models.handle.neighborhood_id == neighborhood.id)
+    counts = {}
+    tweets = []
+    for tweet in query.order_by('created_at desc'):
         if (
             category.name == 'Happy Hours'
             and

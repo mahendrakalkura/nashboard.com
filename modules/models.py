@@ -54,20 +54,16 @@ class category(database.base):
             instance = g.mysql.query(
                 category,
             ).filter(
-                category.position < self.position
-            ).order_by(
-                'position desc'
-            ).first()
+                category.position < self.position,
+            ).order_by('position desc').first()
             if instance:
                 swap(self, instance)
         if direction == 'down':
             instance = g.mysql.query(
                 category,
             ).filter(
-                category.position > self.position
-            ).order_by(
-                'position asc'
-            ).first()
+                category.position > self.position,
+            ).order_by('position asc').first()
             if instance:
                 swap(self, instance)
 
@@ -84,6 +80,39 @@ category.__table__.choices = {
 }
 
 
+class neighborhood(database.base):
+    __tablename__ = 'neighborhoods'
+    __table_args__ = {
+        'autoload': True,
+    }
+
+    def get_position(self):
+        return g.mysql.query('position').from_statement(
+            '''
+            SELECT COALESCE(MAX(position), 0) + 1 AS position
+            FROM neighborhoods
+            '''
+        ).one()[0]
+
+    def set_position(self, direction):
+        if direction == 'up':
+            instance = g.mysql.query(
+                neighborhood,
+            ).filter(
+                neighborhood.position < self.position,
+            ).order_by('position desc').first()
+            if instance:
+                swap(self, instance)
+        if direction == 'down':
+            instance = g.mysql.query(
+                neighborhood,
+            ).filter(
+                neighborhood.position > self.position,
+            ).order_by('position asc').first()
+            if instance:
+                swap(self, instance)
+
+
 class handle(database.base):
     __tablename__ = 'handles'
     __table_args__ = {
@@ -94,7 +123,14 @@ class handle(database.base):
         'category',
         backref=backref('handles', lazy='dynamic'),
         lazy='dynamic',
-        secondary='categories_handles'
+        secondary='categories_handles',
+    )
+
+    neighborhood = relationship(
+        'neighborhood',
+        backref=backref(
+            'handles', cascade='all,delete-orphan', lazy='dynamic',
+        ),
     )
 
 
@@ -140,7 +176,6 @@ class visitor(database.base):
     def __init__(self, *args, **kwargs):
         super(visitor, self).__init__(*args, **kwargs)
         self.timestamp = datetime.now()
-
 
 def swap(one, two):
     one.position, two.position = two.position, one.position

@@ -144,6 +144,105 @@ def categories_process():
     return redirect(url_for('administrators.categories_overview'))
 
 
+@blueprint.route('/neighborhoods/overview')
+@decorators.requires_administrator
+def neighborhoods_overview():
+    return render_template(
+        'administrators/views/neighborhoods_overview.html',
+        neighborhoods=g.mysql.query(
+            models.neighborhood,
+        ).order_by('position asc').all(),
+    )
+
+
+@blueprint.route('/neighborhoods/process', methods=['GET', 'POST'])
+@decorators.requires_administrator
+def neighborhoods_process():
+    if request.method == 'POST':
+        if request.form['submit'] == 'delete':
+            ids = request.form.getlist('ids')
+            if ids:
+                for id in ids:
+                    g.mysql.delete(g.mysql.query(models.neighborhood).get(id))
+                    g.mysql.commit()
+                flash(
+                    'The selected neighborhoods were deleted successfully.',
+                    'success'
+                )
+            else:
+                flash(
+                    'Please select atleast one neighborhood and try again.',
+                    'failure'
+                )
+    return redirect(url_for('administrators.neighborhoods_overview'))
+
+
+@blueprint.route('/neighborhoods/<int:id>/position/<direction>')
+@decorators.requires_administrator
+def neighborhoods_position(id, direction):
+    neighborhood = g.mysql.query(models.neighborhood).get(id)
+    if not neighborhood:
+        abort(404)
+    neighborhood.set_position(direction)
+    return redirect(url_for('administrators.neighborhoods_overview'))
+
+
+@blueprint.route('/neighborhoods/add', methods=['GET', 'POST'])
+@decorators.requires_administrator
+def neighborhoods_add():
+    neighborhood = models.neighborhood()
+    form = forms.neighborhoods_form(request.form, neighborhood)
+    form.id = neighborhood.id
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            neighborhood.position = neighborhood.get_position()
+            g.mysql.add(form.get_instance(neighborhood))
+            g.mysql.commit()
+            flash('The neighborhood was saved successfully.', 'success')
+            return redirect(url_for('administrators.neighborhoods_overview'))
+        flash('The neighborhood was not saved successfully.', 'danger')
+    return render_template(
+        'administrators/views/neighborhoods_add.html', form=form,
+    )
+
+
+@blueprint.route('/neighborhoods/<int:id>/edit', methods=['GET', 'POST'])
+@decorators.requires_administrator
+def neighborhoods_edit(id):
+    neighborhood = g.mysql.query(models.neighborhood).get(id)
+    if not neighborhood:
+        abort(404)
+    form = forms.neighborhoods_form(request.form, neighborhood)
+    form.id = neighborhood.id
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            g.mysql.add(form.get_instance(neighborhood))
+            g.mysql.commit()
+            flash('The neighborhood was updated successfully.', 'success')
+            return redirect(url_for('administrators.neighborhoods_overview'))
+        flash('The neighborhood was not updated successfully.', 'danger')
+    return render_template(
+        'administrators/views/neighborhoods_edit.html', form=form, id=id,
+    )
+
+
+@blueprint.route('/neighborhoods/<int:id>/delete', methods=['GET', 'POST'])
+@decorators.requires_administrator
+def neighborhoods_delete(id):
+    neighborhood = g.mysql.query(models.neighborhood).get(id)
+    if not neighborhood:
+        abort(404)
+    if request.method == 'GET':
+        return render_template(
+            'administrators/views/neighborhoods_delete.html', id=id
+        )
+    if request.method == 'POST':
+        g.mysql.delete(neighborhood)
+        g.mysql.commit()
+        flash('The neighborhood was deleted successfully.', 'success')
+        return redirect(url_for('administrators.neighborhoods_overview'))
+
+
 @blueprint.route('/handles/overview')
 @decorators.requires_administrator
 def handles_overview():

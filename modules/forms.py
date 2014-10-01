@@ -3,7 +3,9 @@
 from bcrypt import gensalt, hashpw
 from flask import g, session
 from flask_wtf import Form
-from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
+from wtforms.ext.sqlalchemy.fields import (
+    QuerySelectField, QuerySelectMultipleField,
+)
 from wtforms.fields import (
     PasswordField,
     SelectField,
@@ -19,6 +21,10 @@ from modules import widgets
 
 def get_categories_factory():
     return g.mysql.query(models.category).order_by('position asc').all()
+
+
+def get_neighborhoods_factory():
+    return g.mysql.query(models.neighborhood).order_by('position asc').all()
 
 
 class categories_form(Form):
@@ -45,6 +51,15 @@ class categories_form(Form):
 
 
 class handles_form(Form):
+    neighborhood = QuerySelectField(
+        allow_blank=False,
+        get_label='name',
+        label='Neighborhood',
+        query_factory=get_neighborhoods_factory,
+        validators=[
+            validators.required(),
+        ],
+    )
     name = TextField(
         label='Name',
         validators=[
@@ -68,6 +83,7 @@ class handles_form(Form):
     )
 
     def get_instance(self, handle):
+        handle.neighborhood = self.neighborhood.data
         handle.name = self.name.data
         handle.categories = self.categories.data
         handle.summary = self.summary.data
@@ -101,6 +117,17 @@ class handles_filters(Form):
                 models.category.id == self.category.data,
             )
         return query
+
+
+class neighborhoods_form(Form):
+    name = TextField(validators=[
+        validators.required(),
+        validators.unique(table='neighborhoods', columns=[]),
+    ])
+
+    def get_instance(self, neighborhood):
+        neighborhood.name = self.name.data
+        return neighborhood
 
 
 class profile(Form):

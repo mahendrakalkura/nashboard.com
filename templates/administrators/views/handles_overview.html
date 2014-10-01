@@ -48,6 +48,7 @@
                                 'options': {},
                             }, order_by, 'handles.name', 'Name', '') }}
                             <th class="narrow text-right">Categories</th>
+                            <th class="narrow">Neighborhood</th>
                             <th class="narrow text-right">Tweets</th>
                             <th class="actions narrow">Actions</th>
                         </tr>
@@ -78,6 +79,9 @@
                                 </td>
                                 <td class="narrow text-right">
                                     {{ handle.categories.count()|format_integer }}
+                                </td>
+                                <td class="narrow">
+                                    {{ handle.neighborhood.name }}
                                 </td>
                                 <td class="narrow text-right">
                                     {{ handle.tweets.count()|format_integer }}

@@ -49,6 +49,14 @@
                         </a>
                     </div>
                     <div class="top pull-right">
+                        <select name="neighborhood_id">
+                            <option value="0">All</option>
+                            {% for neighborhood in g.neighborhoods %}
+                                <option
+                                    value="{{ neighborhood.id }}"
+                                    >{{ neighborhood.name }}</option>
+                            {% endfor %}
+                        </select>
                         <a class="fa fa-facebook"></a>
                         <a class="fa fa-twitter"></a>
                         <a class="fa fa-google-plus"></a>
