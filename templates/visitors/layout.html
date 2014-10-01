@@ -56,13 +56,34 @@
                         <a class="fa fa-arrow-circle-up btn"> sign up</a>
                     </div>
                     <div class="bottom collapse navbar-collapse" id="actual-navbar">
-                        {% block nav %}
-                        {% endblock %}
+                        <ul class="nav navbar-nav">
+                            {% for category in g.categories %}
+                                <li>
+                                    <a
+                                        href="{{ url_for('visitors.dashboard') }}#{{ category.id }}"
+                                        data-id="{{ category.id }}"
+                                        >
+                                        {{ category.name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </nav>
         </header>
         <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    {% with items = get_flashed_messages(
+                        with_categories=true
+                    ) %}
+                    {% for key, value in items %}
+                        <div class="alert alert-{{ key }}">{{ value }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endwith %}
             {% block component %}
             {% endblock %}
             <footer class="row">
@@ -75,6 +96,11 @@
                         <li><a>Terms of Service</a></li>
                         <li><a>Privacy Policy</a></li>
                         <li class="pull-right">Have a place in mind that you don't see here? <a>Let us know.</a></li>
+                        <li>
+                            <a href="{{ url_for('visitors.stay_in_touch') }}">
+                                Stay In Touch
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </footer>

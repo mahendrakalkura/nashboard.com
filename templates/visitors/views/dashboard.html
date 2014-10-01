@@ -2,16 +2,6 @@
 
 {% set title = 'Dashboard' %}
 
-{% block nav %}
-        <ul class="nav navbar-nav">
-            {% for category in categories %}
-                <li>
-                    <a data-id="{{ category.id }}">{{ category.name }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endblock %}
 {% block component %}
     <div class="row">
         <div

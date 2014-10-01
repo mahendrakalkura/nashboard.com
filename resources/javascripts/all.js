@@ -65,24 +65,6 @@ jQuery(function () {
         );
     });
 
-    if (!!body.attr('data-background'))
-        jQuery.backstretch(body.attr('data-background'));
-
-    jQuery('.nav li a[data-id]').click(function () {
-        jQuery('.tweet').remove();
-        window.clearTimeout(timeout);
-        var $this = jQuery(this);
-        jQuery('.nav li').removeClass('active');
-        $this.parent().addClass('active');
-        ajax($this.attr('data-id'));
-    });
-
-    var id = window.location.hash.substr(1);
-    if (id.length) {
-        jQuery('.nav li a[data-id="' + id + '"]').click();
-    } else {
-        jQuery('.nav li a[data-id]:first').click();
-    }
     jQuery(window).scroll(function() {
         var w = jQuery(window).scrollTop();
         if (w >= jQuery('header nav').height())
@@ -90,34 +72,27 @@ jQuery(function () {
         else
             jQuery('header nav').removeClass('small');
     });
-    export_results(jQuery('#export-results'));
-});
 
-var export_results = function(elements){
-    elements.click(function(){
-        var visitors = {};
-        var url = jQuery(this).attr('data-url');
-        var table = jQuery(this).parent().parent().find('table');
-        jQuery.each(table.find('tr:not(:first)'), function(index_) {
-            visitors[index_] = new Array();
-            jQuery.each(jQuery(this).find('td:not(:first)'), function(index) {
-                visitors[index_].push(jQuery(this).text().trim());
-            });
+    if (!!body.attr('data-background')) {
+        jQuery.backstretch(body.attr('data-background'));
+    }
+
+    if (jQuery('#dashboard').length) {
+        jQuery('.nav li a[data-id]').click(function () {
+            jQuery('.tweet').remove();
+            window.clearTimeout(timeout);
+            var $this = jQuery(this);
+            jQuery('.nav li').removeClass('active');
+            $this.parent().addClass('active');
+            ajax($this.attr('data-id'));
+            return false;
         });
-        visitors = JSON.stringify(visitors);
-        var form = [
-            '<form action="'+url+'" id="export" method="post" style="display:none;">',
-            '<input name="csrf_token" type="hidden"/>',
-            '<input name="visitors" type="hidden"/>',
-            '</form>'
-        ];
-        form = form.join('');
-        jQuery('body').append(form);
-        form = jQuery('#export');
-        form.find('[name="csrf_token"]').val(jQuery(this).parent().parent().find('[name="csrf_token"]').val());
-        form.find('[name="visitors"]').val(visitors);
-        form.submit();
-        form.remove();
-        return false;
-    });
-};
+
+        var id = window.location.hash.substr(1);
+        if (id.length) {
+            jQuery('.nav li a[data-id="' + id + '"]').click();
+        } else {
+            jQuery('.nav li a[data-id]:first').click();
+        }
+    }
+});

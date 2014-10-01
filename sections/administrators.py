@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from cStringIO import StringIO
 from csv import QUOTE_ALL, writer
 from flask import (
     abort,
@@ -13,7 +14,6 @@ from flask import (
     session,
     url_for,
 )
-from cStringIO import StringIO
 from simplejson import loads
 
 from modules import classes
@@ -300,8 +300,8 @@ def visitors_overview():
         'visitors',
         {},
         {
-            'column': 'visitors.id',
-            'direction': 'asc',
+            'column': 'timestamp',
+            'direction': 'desc',
         },
         10,
         1
@@ -312,11 +312,11 @@ def visitors_overview():
     return render_template(
         'administrators/views/visitors_overview.html',
         form=form,
+        order_by=order_by,
+        pager=pager,
         visitors=query.order_by('%(column)s %(direction)s' % order_by).all()[
             pager.prefix:pager.suffix
         ],
-        order_by=order_by,
-        pager=pager,
     )
 
 
@@ -330,21 +330,19 @@ def visitors_process():
     return redirect(url_for('administrators.visitors_overview'))
 
 
-@blueprint.route('/visitors/export', methods=['GET', 'POST'])
+@blueprint.route('/visitors/export')
 @decorators.requires_administrator
 def visitors_export():
-    rows = []
-    rows.append([
-        'ID',
-        'Email',
-        'Timestamp',
-    ])
-    for visitor in loads(request.form['visitors']).values():
-        rows.append([
-            visitor[0],
-            visitor[1],
-            visitor[2],
-        ])
+    filters, _, _, _ = utilities.get_filters_order_by_limit_page(
+        'visitors',
+        {},
+        {
+            'column': 'timestamp',
+            'direction': 'desc',
+        },
+        10,
+        1
+    )
     csv = StringIO()
     writer(
         csv,
@@ -354,12 +352,26 @@ def visitors_export():
         quotechar='"',
         quoting=QUOTE_ALL,
         skipinitialspace=True
-    ).writerows(rows)
+    ).writerows([[
+        'ID',
+        'Email',
+        'Timestamp',
+    ]] + [
+        [
+            visitor.id,
+            visitor.email,
+            visitor.timestamp.isoformat(' '),
+        ]
+        for visitor in forms.visitors_filters(
+            **filters
+        ).apply(
+            g.mysql.query(models.visitor)
+        ).order_by('timestamp desc').all()
+    ])
     return Response(
         csv.getvalue(),
         headers={
-            'Content-Disposition':
-            'attachment; filename=export.csv'
+            'Content-Disposition': 'attachment; filename=export.csv',
         },
-        mimetype='text/csv'
+        mimetype='text/csv',
     )

@@ -139,7 +139,7 @@ class visitor(database.base):
 
     def __init__(self, *args, **kwargs):
         super(visitor, self).__init__(*args, **kwargs)
-        self.timestamp = datetime.now().isoformat()
+        self.timestamp = datetime.now()
 
 
 def swap(one, two):

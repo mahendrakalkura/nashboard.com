@@ -3,10 +3,7 @@
 from flask import g
 from wtforms.compat import string_types
 from wtforms.validators import (
-    DataRequired,
-    Email,
-    StopValidation,
-    ValidationError
+    DataRequired, Email, StopValidation, ValidationError,
 )
 
 from modules import database

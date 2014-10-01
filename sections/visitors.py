@@ -21,13 +21,16 @@ from modules import utilities
 blueprint = Blueprint('visitors', __name__)
 
 
+@blueprint.before_request
+def before_request():
+    g.categories = g.mysql.query(
+        models.category,
+    ).order_by('position asc').all()
+
+
 @blueprint.route('/')
 def dashboard():
-    return render_template(
-        'visitors/views/dashboard.html', categories=g.mysql.query(
-            models.category,
-        ).order_by('position asc').all()
-    )
+    return render_template('visitors/views/dashboard.html')
 
 
 @blueprint.route('/ajax', methods=['POST'])
@@ -87,12 +90,10 @@ def stay_in_touch():
         if form.validate_on_submit():
             g.mysql.add(form.get_instance(visitor))
             g.mysql.commit()
-            flash('You are subscribed successfully.', 'success')
-            return redirect(url_for('visitors.dashboard'))
-        flash('You are not subscribed.', 'danger')
-    return render_template(
-        'visitors/views/stay_in_touch.html', form=form,
-    )
+            flash('You have been subscribed successfully.', 'success')
+            return redirect(url_for('visitors.stay_in_touch'))
+        flash('You have not been subscribed successfully.', 'danger')
+    return render_template('visitors/views/stay_in_touch.html', form=form)
 
 
 def callback(attrs, new=False):
