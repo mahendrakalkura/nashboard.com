@@ -2,9 +2,21 @@
 
 from flask import g
 from wtforms.compat import string_types
-from wtforms.validators import DataRequired, StopValidation, ValidationError
+from wtforms.validators import (
+    DataRequired,
+    Email,
+    StopValidation,
+    ValidationError
+)
 
 from modules import database
+
+
+class email(Email):
+
+    def __init__(self, *args, **kwargs):
+        self.message = 'Invalid Email'
+        super(email, self).__init__(*args, **kwargs)
 
 
 class required(DataRequired):

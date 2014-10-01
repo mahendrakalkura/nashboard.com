@@ -154,3 +154,30 @@ class sign_in(Form):
         self.username.errors = ['Invalid Username/Password']
         self.password.errors = []
         return False
+
+
+class visitors_form(Form):
+    email = TextField(validators=[
+        validators.required(),
+        validators.email(),
+        validators.unique(table='visitors', columns=[]),
+    ])
+
+    def get_instance(self, visitor):
+        visitor.email = self.email.data
+        return visitor
+
+
+class visitors_filters(Form):
+    email = TextField(validators=[
+        validators.required(),
+    ])
+
+    def apply(self, query):
+        if self.email.data:
+            query = query.filter(
+                models.visitor.email.like('%%%(email)s%%' % {
+                    'email': self.email.data,
+                })
+            )
+        return query

@@ -2,9 +2,19 @@
 
 from bleach import linkify
 from datetime import datetime, timedelta
-from flask import abort, Blueprint, g, render_template, request
+from flask import (
+    abort,
+    Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    url_for
+)
 from pytz import utc
 
+from modules import forms
 from modules import models
 from modules import utilities
 
@@ -66,6 +76,23 @@ def ajax():
         })
         counts[tweet.handle.screen_name] += 1
     return render_template('visitors/views/ajax.html', tweets=tweets)
+
+
+@blueprint.route('/stay-in-touch', methods=['GET', 'POST'])
+def stay_in_touch():
+    visitor = models.visitor()
+    form = forms.visitors_form(request.form, visitor)
+    form.id = visitor.id
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            g.mysql.add(form.get_instance(visitor))
+            g.mysql.commit()
+            flash('You are subscribed successfully.', 'success')
+            return redirect(url_for('visitors.dashboard'))
+        flash('You are not subscribed.', 'danger')
+    return render_template(
+        'visitors/views/stay_in_touch.html', form=form,
+    )
 
 
 def callback(attrs, new=False):

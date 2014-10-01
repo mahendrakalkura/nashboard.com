@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from flask import g
 from sqlalchemy.orm import backref, relationship
 
@@ -47,7 +48,6 @@ class category(database.base):
             FROM categories
             '''
         ).one()[0]
-
 
     def set_position(self, direction):
         if direction == 'up':
@@ -129,6 +129,17 @@ class tweet(database.base):
         'handle',
         backref=backref('tweets', cascade='all,delete-orphan', lazy='dynamic'),
     )
+
+
+class visitor(database.base):
+    __tablename__ = 'visitors'
+    __table_args__ = {
+        'autoload': True,
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(visitor, self).__init__(*args, **kwargs)
+        self.timestamp = datetime.now().isoformat()
 
 
 def swap(one, two):

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from csv import QUOTE_ALL, writer
 from flask import (
     abort,
     Blueprint,
@@ -7,10 +8,13 @@ from flask import (
     g,
     redirect,
     render_template,
+    Response,
     request,
     session,
     url_for,
 )
+from cStringIO import StringIO
+from simplejson import loads
 
 from modules import classes
 from modules import decorators
@@ -287,3 +291,75 @@ def sign_out():
         del session['administrator']
     flash('You have been signed out successfully.', 'success')
     return redirect(url_for('administrators.dashboard'))
+
+
+@blueprint.route('/visitors/overview', methods=['GET', 'POST'])
+@decorators.requires_administrator
+def visitors_overview():
+    filters, order_by, limit, page = utilities.get_filters_order_by_limit_page(
+        'visitors',
+        {},
+        {
+            'column': 'visitors.id',
+            'direction': 'asc',
+        },
+        10,
+        1
+    )
+    form = forms.visitors_filters(**filters)
+    query = form.apply(g.mysql.query(models.visitor))
+    pager = classes.pager(query.count(), limit, page)
+    return render_template(
+        'administrators/views/visitors_overview.html',
+        form=form,
+        visitors=query.order_by('%(column)s %(direction)s' % order_by).all()[
+            pager.prefix:pager.suffix
+        ],
+        order_by=order_by,
+        pager=pager,
+    )
+
+
+@blueprint.route('/visitors/process', methods=['GET', 'POST'])
+@decorators.requires_administrator
+def visitors_process():
+    if request.method == 'GET':
+        utilities.set_order_by_limit_page('visitors')
+    if request.method == 'POST':
+        utilities.set_filters('visitors', forms.visitors_filters)
+    return redirect(url_for('administrators.visitors_overview'))
+
+
+@blueprint.route('/visitors/export', methods=['GET', 'POST'])
+@decorators.requires_administrator
+def visitors_export():
+    rows = []
+    rows.append([
+        'ID',
+        'Email',
+        'Timestamp',
+    ])
+    for visitor in loads(request.form['visitors']).values():
+        rows.append([
+            visitor[0],
+            visitor[1],
+            visitor[2],
+        ])
+    csv = StringIO()
+    writer(
+        csv,
+        delimiter=',',
+        doublequote=True,
+        lineterminator='\n',
+        quotechar='"',
+        quoting=QUOTE_ALL,
+        skipinitialspace=True
+    ).writerows(rows)
+    return Response(
+        csv.getvalue(),
+        headers={
+            'Content-Disposition':
+            'attachment; filename=export.csv'
+        },
+        mimetype='text/csv'
+    )

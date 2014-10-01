@@ -90,5 +90,34 @@ jQuery(function () {
         else
             jQuery('header nav').removeClass('small');
     });
-
+    export_results(jQuery('#export-results'));
 });
+
+var export_results = function(elements){
+    elements.click(function(){
+        var visitors = {};
+        var url = jQuery(this).attr('data-url');
+        var table = jQuery(this).parent().parent().find('table');
+        jQuery.each(table.find('tr:not(:first)'), function(index_) {
+            visitors[index_] = new Array();
+            jQuery.each(jQuery(this).find('td:not(:first)'), function(index) {
+                visitors[index_].push(jQuery(this).text().trim());
+            });
+        });
+        visitors = JSON.stringify(visitors);
+        var form = [
+            '<form action="'+url+'" id="export" method="post" style="display:none;">',
+            '<input name="csrf_token" type="hidden"/>',
+            '<input name="visitors" type="hidden"/>',
+            '</form>'
+        ];
+        form = form.join('');
+        jQuery('body').append(form);
+        form = jQuery('#export');
+        form.find('[name="csrf_token"]').val(jQuery(this).parent().parent().find('[name="csrf_token"]').val());
+        form.find('[name="visitors"]').val(visitors);
+        form.submit();
+        form.remove();
+        return false;
+    });
+};

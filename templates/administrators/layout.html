@@ -95,6 +95,18 @@
                                             Handles
                                         </a>
                                     </li>
+                                    <li class="{{
+                                        'active'
+                                        if navbar == 'visitors'
+                                        else ''
+                                    }}">
+                                        <a href="{{ url_for(
+                                            'administrators.visitors_overview'
+                                        ) }}">
+                                            <i class="fa fa-fw fa-users"></i>
+                                            Visitors
+                                        </a>
+                                    </li>
                                 {% else %}
                                     <li class="{{
                                         'active' if navbar == 'sign_in' else ''
