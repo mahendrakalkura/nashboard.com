@@ -175,9 +175,7 @@ class visitors_filters(Form):
 
     def apply(self, query):
         if self.email.data:
-            query = query.filter(
-                models.visitor.email.like('%%%(email)s%%' % {
-                    'email': self.email.data,
-                })
-            )
+            query = query.filter(models.visitor.email.like('%%%(email)s%%' % {
+                'email': self.email.data,
+            }))
         return query

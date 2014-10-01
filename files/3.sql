@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `visitors` (
     `email` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     `timestamp` DATETIME NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `email` (`email`),
+    UNIQUE KEY `email` (`email`),
     INDEX `timestamp` (`timestamp`)
 )
 ENGINE=InnoDB
