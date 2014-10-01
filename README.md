@@ -39,6 +39,7 @@ mysql> create database nashboard;
 $ mysql nashboard < files/0.sql
 $ mysql nashboard < files/1.sql
 $ mysql nashboard < files/2.sql
+$ mysql nashboard < files/3.sql
 ```
 
 Assets
