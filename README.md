@@ -40,6 +40,7 @@ $ mysql nashboard < files/0.sql
 $ mysql nashboard < files/1.sql
 $ mysql nashboard < files/2.sql
 $ mysql nashboard < files/3.sql
+$ mysql nashboard < files/4.sql
 ```
 
 Assets

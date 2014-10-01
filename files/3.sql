@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `visitors` (
     `timestamp` DATETIME NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `email` (`email`),
-    INDEX `timestamp` (`timestamp`)
+    KEY `timestamp` (`timestamp`)
 )
 ENGINE=InnoDB
 DEFAULT
