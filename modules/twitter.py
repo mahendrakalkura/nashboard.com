@@ -114,7 +114,6 @@ def get_tweets(q):
     while True:
         response = None
         try:
-            print 'https://twitter.com/i/search/timeline'
             response = get(
                 'https://twitter.com/i/search/timeline',
                 headers=headers,
@@ -212,7 +211,6 @@ def get_tweet(tweet):
                 break
             response = None
             try:
-                print url
                 response = get(url, proxies=get_proxies(), timeout=60.00)
             except RequestException:
                 break
