@@ -8,7 +8,6 @@ from urlparse import urlparse
 
 from furl import furl
 from requesocks import get
-from requesocks.exceptions import RequestException
 from requesocks.packages.urllib3.packages.socksipy.socks import Socks5Error
 from scrapy.selector import Selector
 from simplejson import loads
@@ -121,7 +120,7 @@ def get_tweets(q):
                 proxies=get_proxies(),
                 timeout=60.00
             )
-        except RequestException:
+        except Exception:
             break
         if not response:
             break
@@ -212,7 +211,7 @@ def get_tweet(tweet):
             response = None
             try:
                 response = get(url, proxies=get_proxies(), timeout=60.00)
-            except RequestException:
+            except Exception:
                 break
             if not response:
                 break
