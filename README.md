@@ -57,7 +57,8 @@ Twitter
 
 ```
 $ workon nashboard.com
-$ python manager.py twitter_
+$ python manager.py twitter_test
+$ python manager.py twitter_process
 $ deactivate
 ```
 

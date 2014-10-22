@@ -8,14 +8,7 @@ from urlparse import urlparse
 
 from furl import furl
 from requesocks import get
-from requesocks.exceptions import (
-    ConnectionError,
-    HTTPError,
-    RequestException,
-    SSLError,
-    TooManyRedirects,
-    URLRequired,
-)
+from requesocks.exceptions import RequestException
 from requesocks.packages.urllib3.packages.socksipy.socks import Socks5Error
 from scrapy.selector import Selector
 from simplejson import loads
@@ -72,6 +65,21 @@ def process():
         session.commit()
 
 
+def test():
+    return get_tweets('@from:SamsSportsGrill')
+
+
+def get_proxies():
+    return {
+        'http': 'socks5://72.52.91.120:%(port)d' % {
+            'port': (9050 + randint(1, 50)),
+        },
+        'https': 'socks5://72.52.91.120:%(port)d' % {
+            'port': (9050 + randint(1, 50)),
+        },
+    }
+
+
 def get_tweets(q):
     tweets = []
     params = {
@@ -104,29 +112,21 @@ def get_tweets(q):
         'x-twitter-polling': 'true',
     }
     while True:
+        response = None
         try:
+            print 'https://twitter.com/i/search/timeline'
             response = get(
                 'https://twitter.com/i/search/timeline',
                 headers=headers,
                 params=params,
-                proxies={
-                    'http': 'socks5://72.52.91.120:%(port)d' % {
-                        'port': (9050 + randint(1, 50)),
-                    },
-                    'https': 'socks5://72.52.91.120:%(port)d' % {
-                        'port': (9050 + randint(1, 50)),
-                    },
-                },
+                proxies=get_proxies(),
                 timeout=60.00
             )
-        except (
-            ConnectionError,
-            HTTPError,
-            RequestException,
-            Socks5Error,
-            TooManyRedirects,
-            URLRequired,
-        ):
+        except RequestException:
+            break
+        if not response:
+            break
+        if not response.status_code == 200:
             break
         try:
             contents = loads(response.text)
@@ -210,36 +210,24 @@ def get_tweet(tweet):
             if 'fbcdn' in url and ('hprofile' in url or 'hphotos' in url):
                 media = url
                 break
-            else:
-                try:
-                    facebook_ = get(
-                        url,
-                        proxies={
-                            'http': 'socks5://72.52.91.120:%(port)d' % {
-                                'port': (9050 + randint(1, 50)),
-                            },
-                            'https': 'socks5://72.52.91.120:%(port)d' % {
-                                'port': (9050 + randint(1, 50)),
-                            },
-                        },
-                        timeout=60.00
-                    )
-                except (
-                    ConnectionError,
-                    HTTPError,
-                    RequestException,
-                    Socks5Error,
-                    SSLError,
-                    TooManyRedirects,
-                    URLRequired,
-                ):
-                    continue
-                try:
-                    media = Selector(text=facebook_.text).xpath(
-                        '//img[@id="fbPhotoImage"]/@src'
-                    ).extract()[0]
-                except IndexError:
-                    pass
+            response = None
+            try:
+                print url
+                response = get(url, proxies=get_proxies(), timeout=60.00)
+            except RequestException:
+                break
+            if not response:
+                break
+            if not response.status_code == 200:
+                break
+            try:
+                media = Selector(
+                    text=response.text
+                ).xpath(
+                    '//img[@id="fbPhotoImage"]/@src'
+                ).extract()[0]
+            except IndexError:
+                pass
     if (
         created_at
         and

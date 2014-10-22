@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from logging import getLogger
+from pprint import pprint
 
 from flask.ext.script import Manager
 from webassets.script import CommandLineEnvironment
@@ -21,9 +22,14 @@ def assets_():
 
 @manager.command
 @decorators.profile(0)
-def twitter_():
+def twitter_process():
     twitter.process()
 
+
+@manager.command
+@decorators.profile(0)
+def twitter_test():
+    pprint(twitter.test())
 
 if __name__ == '__main__':
     manager.run()
