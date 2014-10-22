@@ -12,6 +12,7 @@ from requesocks.exceptions import (
     ConnectionError,
     HTTPError,
     RequestException,
+    SSLError,
     TooManyRedirects,
     URLRequired,
 )
@@ -209,6 +210,36 @@ def get_tweet(tweet):
             if 'fbcdn' in url and ('hprofile' in url or 'hphotos' in url):
                 media = url
                 break
+            else:
+                try:
+                    facebook_ = get(
+                        url,
+                        proxies={
+                            'http': 'socks5://72.52.91.120:%(port)d' % {
+                                'port': (9050 + randint(1, 50)),
+                            },
+                            'https': 'socks5://72.52.91.120:%(port)d' % {
+                                'port': (9050 + randint(1, 50)),
+                            },
+                        },
+                        timeout=60.00
+                    )
+                except (
+                    ConnectionError,
+                    HTTPError,
+                    RequestException,
+                    Socks5Error,
+                    SSLError,
+                    TooManyRedirects,
+                    URLRequired,
+                ):
+                    continue
+                try:
+                    media = Selector(text=facebook_.text).xpath(
+                        '//img[@id="fbPhotoImage"]/@src'
+                    ).extract()[0]
+                except IndexError:
+                    pass
     if (
         created_at
         and
