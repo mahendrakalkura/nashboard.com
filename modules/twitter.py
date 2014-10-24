@@ -4,11 +4,11 @@ from contextlib import closing
 from datetime import datetime, timedelta
 from random import choice, randint
 from re import findall
+from ssl import SSLError
 from urlparse import urlparse
 
 from furl import furl
 from requesocks import get
-from requesocks.packages.urllib3.packages.socksipy.socks import Socks5Error
 from scrapy.selector import Selector
 from simplejson import loads
 from simplejson.scanner import JSONDecodeError
@@ -26,7 +26,7 @@ def process():
             log.write(10, handle.name, 1)
             tweets = []
             if not tweets:
-                tweets = get_tweets('from:@%(name)s' % {
+                tweets = get_tweets('from:%(name)s' % {
                     'name': handle.name,
                 })
             if not tweets:
@@ -65,7 +65,47 @@ def process():
 
 
 def test():
-    return get_tweets('@from:SamsSportsGrill')
+    return get_tweets('from:TwoBitsNash')
+
+
+def get_facebook(url):
+    response = None
+    try:
+        response = get(url, proxies=get_proxies(), timeout=60.00)
+    except (Exception, SSLError):
+        pass
+    if not response:
+        return
+    if not response.status_code == 200:
+        return
+    try:
+        return Selector(
+            text=response.text
+        ).xpath(
+            '//img[@id="fbPhotoImage"]/@src'
+        ).extract()[0]
+    except IndexError:
+        pass
+
+
+def get_instagram(url):
+    response = None
+    try:
+        response = get(url, proxies=get_proxies(), timeout=60.00)
+    except (Exception, SSLError):
+        pass
+    if not response:
+        return
+    if not response.status_code == 200:
+        return
+    try:
+        return Selector(
+            text=response.text
+        ).xpath(
+            '//meta[@property="og:image"]/@content'
+        ).extract()[0]
+    except IndexError:
+        pass
 
 
 def get_proxies():
@@ -120,7 +160,7 @@ def get_tweets(q):
                 proxies=get_proxies(),
                 timeout=60.00
             )
-        except Exception:
+        except (Exception, SSLError):
             break
         if not response:
             break
@@ -171,9 +211,9 @@ def get_tweet(tweet):
     except IndexError:
         pass
     try:
-        media = Selector(text=tweet.xpath(
-            './/@data-expanded-footer'
-        ).extract()[0]).xpath('.//img/@src').extract()[0]
+        media = tweet.xpath(
+            './/a[@data-resolved-url-large]/@data-resolved-url-large'
+        ).extract()[0]
     except IndexError:
         pass
     try:
@@ -208,23 +248,15 @@ def get_tweet(tweet):
             if 'fbcdn' in url and ('hprofile' in url or 'hphotos' in url):
                 media = url
                 break
-            response = None
-            try:
-                response = get(url, proxies=get_proxies(), timeout=60.00)
-            except Exception:
-                break
-            if not response:
-                break
-            if not response.status_code == 200:
-                break
-            try:
-                media = Selector(
-                    text=response.text
-                ).xpath(
-                    '//img[@id="fbPhotoImage"]/@src'
-                ).extract()[0]
-            except IndexError:
-                pass
+            netloc = urlparse(url).netloc
+            if netloc == 'fb.me':
+                media = get_facebook(url)
+                if media:
+                    break
+            if 'instagram.com' in url:
+                media = get_instagram(url)
+                if media:
+                    break
     if (
         created_at
         and

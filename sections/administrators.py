@@ -14,7 +14,6 @@ from flask import (
     session,
     url_for,
 )
-from simplejson import loads
 
 from modules import classes
 from modules import decorators
