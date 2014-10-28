@@ -85,7 +85,7 @@ def get_facebook(url):
             '//img[@id="fbPhotoImage"]/@src'
         ).extract()[0]
     except IndexError:
-        pass
+        return ''
 
 
 def get_instagram(url):
@@ -105,7 +105,7 @@ def get_instagram(url):
             '//meta[@property="og:image"]/@content'
         ).extract()[0]
     except IndexError:
-        pass
+        return ''
 
 
 def get_proxies():
