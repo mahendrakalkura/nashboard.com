@@ -1,7 +1,7 @@
 <div id="tweets">
     {% for tweet in tweets %}
         <div class="tweet row" data-id="{{ tweet.id }}">
-            <div class="col-sm-4 part info">
+            <div class="col-sm-3 part info">
                 <a
                     class="handle_profile_image_url"
                     href="https://twitter.com/{{ tweet.handle_name }}"
@@ -18,7 +18,7 @@
                     {{ tweet.created_at }}
                 </p>
             </div>
-            <div class="col-sm-8 part body">
+            <div class="col-sm-7 part body">
                 <p class="text">{{ tweet.text|safe }}</p>
                 {% if tweet.media %}
                     <p class="media text-center">

@@ -49,6 +49,9 @@
                         </a>
                     </div>
                     <div class="top pull-right">
+                        <a class="fa fa-facebook" href="https://www.facebook.com/Nashboard1" target="_blank"></a>
+                        <a class="fa fa-twitter" href="https://twitter.com/Nash_Board" target="_blank"></a>
+                        <a class="fa fa-google-plus" href="https://plus.google.com/u/0/116377714345562414491" target="_blank"></a>
                         <select name="neighborhood_id">
                             <option value="0">All Neighborhoods</option>
                             {% for neighborhood in g.neighborhoods %}
@@ -57,11 +60,9 @@
                                     >{{ neighborhood.name }}</option>
                             {% endfor %}
                         </select>
-                        <a class="fa fa-facebook"></a>
-                        <a class="fa fa-twitter"></a>
-                        <a class="fa fa-google-plus"></a>
-                        <a class="fa fa-sign-in btn"> sign in</a>
-                        <a class="fa fa-arrow-circle-up btn"> sign up</a>
+                        <div class="clear hidden"></div>
+                        <a class="fa fa-sign-in btn" href="{{ url_for('visitors.stay_in_touch')}}?f=1"> sign in</a>
+                        <a class="fa fa-arrow-circle-up btn" href="{{ url_for('visitors.stay_in_touch')}}?f=1"> sign up</a>
                     </div>
                     <div class="bottom collapse navbar-collapse" id="actual-navbar">
                         <ul class="nav navbar-nav">
@@ -82,36 +83,36 @@
         </header>
         <div class="container">
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    {% with items = get_flashed_messages(
-                        with_categories=true
-                    ) %}
-                    {% for key, value in items %}
-                        <div class="alert alert-{{ key }}">{{ value }}</div>
-                    {% endfor %}
+                <div class="col-md-9 col-md-offset-3">
+                    <div class="row">
+                        {% with items = get_flashed_messages(
+                            with_categories=true
+                        ) %}
+                            {% for key, value in items %}
+                                <div class="alert alert-{{ key }}">{{ value }}</div>
+                            {% endfor %}
+                        {% endwith %}
+                    </div>
+                    {% block component %}
+                    {% endblock %}
                 </div>
+                <footer>
+                    <div class="col-lg-12 col-md-12">
+                        <ul class="nav nav-pills">
+                            <li><a href="{{ url_for('visitors.about') }}">About Us</a></li>
+                            <li><a href="{{ url_for('visitors.about') }}#contact">Advertise</a></li>
+                            <li><a href="https://medium.com/@NashBoard" target="_blank">Blog</a></li>
+                            <li><a href="{{ url_for('visitors.privacy_policy') }}">Privacy Policy</a></li>
+                            <li>
+                                <a href="{{ url_for('visitors.stay_in_touch') }}">
+                                    Stay In Touch
+                                </a>
+                            </li>
+                            <li class="pull-right"><p>Have a place in mind that you don't see here? <a href="{{ url_for('visitors.about') }}#contact">Let us know.</a></p></li>
+                        </ul>
+                    </div>
+                </footer>
             </div>
-            {% endwith %}
-            {% block component %}
-            {% endblock %}
-            <footer class="row">
-                <div class="col-lg-12 col-md-12">
-                    <ul class="nav nav-pills">
-                        <li><a>About Us</a></li>
-                        <li><a>Advertise</a></li>
-                        <li><a>Blog</a></li>
-                        <li><a>Press</a></li>
-                        <li><a>Terms of Service</a></li>
-                        <li><a>Privacy Policy</a></li>
-                        <li class="pull-right">Have a place in mind that you don't see here? <a>Let us know.</a></li>
-                        <li>
-                            <a href="{{ url_for('visitors.stay_in_touch') }}">
-                                Stay In Touch
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </footer>
         </div>
         <div class="hide" id="overlay"></div>
         <div class="hide" id="spinner"></div>

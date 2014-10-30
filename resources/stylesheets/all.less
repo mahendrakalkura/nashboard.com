@@ -185,6 +185,26 @@ body {
         /* apply to tablets and phones */
         @media (max-width: @screen-sm-max) {
             font-size: 1.2em;
+            .navbar-collapse {
+                box-shadow: none;
+            }
+            .navbar-collapse.collapsing {
+                box-shadow: none !important;
+                border: none;
+            }
+            header {
+                padding-bottom: 250px !important;
+            }
+        }
+        //apply to phones only
+        @media (max-width: @screen-xs-max) {
+            .clear {
+                display: block !important;
+            }
+            .pull-right {
+                width: 100%;
+                text-align: center;
+            }
         }
         header {
             background: none;
@@ -195,6 +215,11 @@ body {
             @media (max-width: @screen-sm-max) {
                 background: rgba(0,0,0,0.7);
             }
+            .logo {
+                float: none;
+                margin: 10px auto !important;
+                display: block !important;
+            }
             background: rgba(0,0,0,0.1);
             border: none;
             box-shadow: none;
@@ -202,7 +227,7 @@ body {
                 position: relative;
             }
             .navbar-toggle {
-                border: 3px solid rgba(255,255,255,0.4);
+                border: 2px solid rgba(255,255,255,0.4);
                 background: none;
                 .icon-bar {
                     background: rgba(255,255,255,0.4);
@@ -226,16 +251,23 @@ body {
             }
             .top {
                 font-size: 1.5em;
-                a {
+                a,button {
                     color: #AECAE4;
                     margin: 5px;
+                    vertical-align: middle;
                     &:hover {
                         color: #FF0;
                     }
                 }
                 select {
-                    font-size: 0.5em;
-                    margin-top: -3px;
+                    font-size: 0.6em;
+                    border: none;
+                    border: navajowhite;
+                    height: 26px;
+                    background: #76B3EA;
+                    font-weight: bold;
+                    color: #FFF;
+                    vertical-align: middle;
                 }
                 .btn {
                     background: #427BAF;
@@ -317,6 +349,76 @@ body {
         .pull-right + .pull-right {
             margin-right: 20px;
         }
+        .stayInTouch {
+            padding: 150px 0;
+            margin-bottom: 100px;
+            border-radius: 10px;
+            background: url('/resources/images/coolBackground.jpg');
+            background-size: cover;
+            &> div {   
+                background: rgba(255,255,255,0.9);
+                padding: 30px;
+                border-radius: 5px;
+                max-width: 85%;
+                margin: auto;
+                float: none;
+                position: relative;
+                &:after {
+                    content: "";
+                    position: absolute;
+                    right: 85%;
+                    top: 100%;
+                    border: 1.4em solid rgba(255,255,255,0.9);
+                    border-left-color: transparent;
+                    border-bottom-color: transparent;
+                }
+                p {
+                    font-size: 1.2em;
+                    text-align: center;
+                }
+                input {
+                    border: none;
+                    box-shadow: none;
+                    border: 1px solid #ddd;
+                }
+                .btn.btn-success {
+                    background: #77BB5B;
+                    border: none;
+                    padding: 10px 20px;
+                    padding-left: 10px;
+                    text-shadow: none;
+                    &:hover {
+                        background: #7ADD53;
+                    }
+                }
+            }
+        }
+        .row.normal {
+            max-width: 600px;
+            margin: auto;
+            margin-bottom: 100px;
+            background: #F9F9F9 url('/resources/images/geometry.png');
+            border-radius: 20px;
+            padding: 50px;
+            position: relative;
+            &:after {
+                content: "";
+                position: absolute;
+                right: 85%;
+                top: 100%;
+                border: 1.4em solid #F9F9F9;
+                border-left-color: transparent;
+                border-bottom-color: transparent;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+            .email {
+                padding: 10px 20px;
+                border: 2px solid;
+                border-radius: 10px;
+            }
+        }
     }
 }
 
@@ -335,6 +437,8 @@ p {
 }
 
 footer {
+    position: fixed !important;
+    width: 18%;
     color: #FFF;
     border-top: 1px solid rgba(255,255,255,0.2);
     ul.nav li a {
@@ -343,6 +447,36 @@ footer {
         &:hover {
             color: #FFFF6B;
             background: none;
+        }
+    }
+    //for desktop only
+    @media (min-width: @screen-md-min) {
+        background: #5D8DB8;
+        padding: 20px 0;
+        border-top: none;
+        border-radius: 10px;
+        > div {
+            padding: 0 !important;
+            li {
+                float: none;
+                width: 100%;
+                margin-left: 0 !important;
+                transition: all 200ms ease-in-out;
+            }
+            li > a {
+                width: 100%;
+                text-transform: uppercase;
+                border-radius: 0 !important;
+                border-left: 5px solid;
+            }
+            li > a:hover {
+            }
+            li p {
+                padding: 10px 15px;
+            }
+            li:last-child > a {
+                border: none;
+            }
         }
     }
 }
@@ -420,9 +554,10 @@ footer {
 #tweets > div:nth-child(even) {
     &> .part {
     float: right;
+    margin-left: 0;
     }
     .body:after {
-        border: 0.8em solid #FCFCFC;
+        border: 0.8em solid #FEFFE4;
         right: auto;
         left: 100%;
         border-right-color: transparent;
@@ -433,7 +568,7 @@ footer {
     margin-bottom: 2em;
     .info {
         padding: 1em 0;
-        color: #859EBE;
+        color: #F9F9F9;
         &> * {
             margin: auto;
             text-align: center;
@@ -441,15 +576,15 @@ footer {
         }
     }
     .body {
-        background: #FCFCFC;
-        border-radius: 5px;
-        padding: 1em;
+        background: #F9F9F9;
+        border-radius: 10px;
+        padding: 2em;
         &:after {
             content: "";
             position: absolute;
             right: 100%;
             top: 4.5em;
-            border: 0.8em solid #FCFCFC;
+            border: 0.8em solid #F9F9F9;
             border-left-color: transparent;
             border-bottom-color: transparent;
         }
@@ -465,11 +600,12 @@ footer {
         img {
             height: inherit;
             width: inherit;
-            border-radius: 5px;
+            border-radius: 10px;
+            border: 4px solid #C9E5FC;
             transition: all 200ms ease-in-out;
-            &:hover {
-                box-shadow: 0 0 10px rgba(255,255,255,0.3);
-            }
+        }
+        &:hover + .handle_screen_name {
+            color: #FFFB93;
         }
     }
     .handle_screen_name {
@@ -490,6 +626,7 @@ footer {
         padding: 2em 0 1em 0;
         word-wrap: break-word;
     }
+    //for phone
     @media (max-width: @screen-xs-max) {
         .body {
             margin: 0 1em;
@@ -506,6 +643,19 @@ footer {
             color: #A1B9D6;
             float: none !important;
         }
+    }
+}
+@media (max-width: @screen-sm-max) {
+    body > .container {
+        width: 90%;
+    }
+    body > .background {   
+        background-image: none;
+        background: #9FC0DF;
+    }
+    footer {
+        position: static !important;
+        width: 100%;
     }
 }
 

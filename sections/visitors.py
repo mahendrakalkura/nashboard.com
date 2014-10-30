@@ -103,9 +103,19 @@ def stay_in_touch():
             g.mysql.commit()
             flash('You have been subscribed successfully.', 'success')
             return redirect(url_for('visitors.stay_in_touch'))
-        flash('You have not been subscribed successfully.', 'danger')
+        flash('There was a problem..', 'danger')
+    if request.args.get('f'):
+        flash("We're still under development! Check back later for updates!",'warning')
+
     return render_template('visitors/views/stay_in_touch.html', form=form)
 
+@blueprint.route('/privacy-policy')
+def privacy_policy():
+    return render_template('visitors/views/privacy_policy.html')
+
+@blueprint.route('/about')
+def about():
+    return render_template('visitors/views/about.html')
 
 def callback(attrs, new=False):
     attrs['rel'] = 'nofollow'

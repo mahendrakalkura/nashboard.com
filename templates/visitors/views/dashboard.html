@@ -3,21 +3,18 @@
 {% set title = 'Dashboard' %}
 
 {% block component %}
-    <div class="row">
-        <div
-            class="col-md-8 col-md-offset-2"
-            id="dashboard"
-            data-url="{{ url_for('visitors.ajax') }}"
-            >
-            <div id="tweets"></div>
-            <div class="alert alert-danger" id="failure_1">
-                <i class="fa fa-fw fa-exclamation-triangle"></i>
-                An unknown error has occurred. Please try again.
-            </div>
-            <div class="alert alert-danger" id="failure_2">
-                <i class="fa fa-fw fa-exclamation-triangle"></i>
-                There are no tweets in the database. Please try again.
-            </div>
+    <div class="row"
+        id="dashboard"
+        data-url="{{ url_for('visitors.ajax') }}"
+        >
+        <div id="tweets"></div>
+        <div class="alert alert-danger" id="failure_1">
+            <i class="fa fa-fw fa-exclamation-triangle"></i>
+            An unknown error has occurred. Please try again.
+        </div>
+        <div class="alert alert-danger" id="failure_2">
+            <i class="fa fa-fw fa-exclamation-triangle"></i>
+            There are no tweets in the database. Please try again.
         </div>
     </div>
 {% endblock %}
