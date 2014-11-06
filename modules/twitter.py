@@ -283,7 +283,7 @@ def get_tweet(tweet):
         return {
             'created_at': created_at,
             'id': id,
-            'media': media,
+            'media': media or '',
             'text': text,
             'user_name': user_name,
             'user_profile_image_url': user_profile_image_url,
