@@ -11,7 +11,12 @@
             content="text/html; charset=UTF-8"
             http-equiv="Content-Type"
             >
-        <meta content="..." name="description">
+        <meta content="Ask a bunch of Nashvillians what their favorite 
+        thing is about Nashville, and you'll likely get a different answer 
+        from each person.  Nashville is an exciting, vibrant, and diverse place; 
+        one thing we all agree on is the never-ending supply of fun events and activities 
+        that is ever-present here in our city.  The abundance of opportunities can be 
+        overwhelming at times, and staying in the loop presents a challenge." name="description">
         <meta content="Joe Parry" name="author">
         <meta
             name="viewport"
@@ -53,7 +58,7 @@
                         <a class="fa fa-twitter" href="https://twitter.com/Nash_Board" target="_blank"></a>
                         <a class="fa fa-google-plus" href="https://plus.google.com/u/0/116377714345562414491" target="_blank"></a>
                         <select name="neighborhood_id">
-                            <option value="0">All Neighborhoods</option>
+                            <option value="0">Filter By Neighborhoods</option>
                             {% for neighborhood in g.neighborhoods %}
                                 <option
                                     value="{{ neighborhood.id }}"
@@ -99,7 +104,7 @@
                 <footer>
                     <div class="col-lg-12 col-md-12">
                         <ul class="nav nav-pills">
-                            <li><a href="{{ url_for('visitors.about') }}">About Us</a></li>
+                            <li><a href="{{ url_for('visitors.about') }}">About</a></li>
                             <li><a href="{{ url_for('visitors.about') }}#contact">Advertise</a></li>
                             <li><a href="https://medium.com/@NashBoard" target="_blank">Blog</a></li>
                             <li><a href="{{ url_for('visitors.privacy_policy') }}">Privacy Policy</a></li>
