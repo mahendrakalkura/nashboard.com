@@ -264,12 +264,12 @@ body {
                     border: none;
                     border: navajowhite;
                     height: 26px;
-                    background: #FFE907;
+                    background: #76B3EA;
                     font-weight: bold;
-                    color: #B5A84E;
+                    color: #FFF;
                     vertical-align: middle;
                     &:hover {
-                        background: #FFF373;
+                        background: #70BBFF;
                     }
                 }
                 .btn {
@@ -421,6 +421,21 @@ body {
                 border: 2px solid;
                 border-radius: 10px;
             }
+            .focusOver {
+                -webkit-animation: popover 1.5s; /* Chrome, Safari, Opera */
+                animation: popover 1.5s;            
+            }
+            @-webkit-keyframes popover {
+                0% { color: #333; }
+                50% { color: #FF0; }
+                100% { color: #333; }
+            }
+            @keyframes popover {
+                0% { color: #333; }
+                50% { color: #FF0; }
+                100% { color: #333; }
+            }
+
         }
     }
 }

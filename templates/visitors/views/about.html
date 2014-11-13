@@ -12,4 +12,9 @@
         <p>Have questions? Consultation? Contact us at:</p>
         <a href="mailto:nashboardnashville@gmail.com" class="btn email"><i class="fa fa-external-link"></i> nashboardnashville@gmail.com</a>
     </div>
+    <script>
+		if (window.location.hash != "") {
+		     document.getElementById('contact').className = document.getElementById('contact') + ' focusOver';
+		}
+    </script>
 {% endblock %}
