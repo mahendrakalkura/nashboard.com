@@ -241,6 +241,7 @@ def get_tweet(tweet):
         user_screen_name = tweet.xpath('.//@data-name').extract()[0]
     except ValueError:
         pass
+    '''
     if not media:
         for url in findall(
             r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'
@@ -259,6 +260,7 @@ def get_tweet(tweet):
                 media = get_instagram(url)
                 if media:
                     break
+    '''
     if (
         created_at
         and
