@@ -172,7 +172,10 @@ class sign_in(Form):
             if (
                 username == self.username.data
                 and
-                hashpw(self.password.data.encode('utf-8'), password.encode('utf-8'))
+                hashpw(
+                    self.password.data.encode('utf-8'),
+                    password.encode('utf-8'),
+                )
                 ==
                 password
             ):

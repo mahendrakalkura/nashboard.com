@@ -10,8 +10,12 @@ Scrapy==0.24.2
 Twisted==14.0.0
 WTForms==2.0.1
 Werkzeug==0.9.6
+amqp==1.4.6
+anyjson==0.3.3
 bcrypt==1.0.2
+billiard==3.3.0.19
 bleach==1.4
+celery==3.1.17
 certifi==14.05.14
 cffi==0.8.6
 characteristic==0.1.0
@@ -20,8 +24,11 @@ cryptography==0.5.2
 cssmin==0.2.0
 cssselect==0.9.1
 furl==0.3.95
+gevent==1.0.1
+greenlet==0.4.5
 html5lib==0.999
 itsdangerous==0.24
+kombu==3.0.24
 lxml==3.3.5
 orderedmultidict==0.7.3
 pyOpenSSL==0.14

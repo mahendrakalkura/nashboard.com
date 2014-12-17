@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from contextlib import closing
-from datetime import datetime, timedelta
+from datetime import datetime
 from random import choice, randint
 from re import findall
 from ssl import SSLError
@@ -12,60 +11,6 @@ from requesocks import get
 from scrapy.selector import Selector
 from simplejson import loads
 from simplejson.scanner import JSONDecodeError
-
-from modules import database
-from modules import log
-from modules import models
-from modules import utilities
-
-
-def process():
-    with closing(database.session()) as session:
-        for handle in session.query(models.handle).order_by('id asc').all():
-            seven_days_ago = datetime.now() - timedelta(days=7)
-            log.write(10, handle.name, 1)
-            tweets = []
-            if not tweets:
-                tweets = get_tweets('from:%(name)s' % {
-                    'name': handle.name,
-                })
-            if not tweets:
-                tweets = get_tweets(handle.name)
-            for tweet in tweets:
-                if tweet['text'].startswith('@'):
-                    continue
-                if tweet['text'].startswith('I posted'):
-                    continue
-                if utilities.is_retweet(tweet['text']):
-                    continue
-                if tweet['created_at'] <= seven_days_ago:
-                    continue
-                if tweet['user_name'] == handle.name:
-                    instance = session.query(models.tweet).get(tweet['id'])
-                    if not instance:
-                        instance = models.tweet(**{
-                            'id': tweet['id'],
-                        })
-                    instance.handle = handle
-                    instance.created_at = tweet['created_at']
-                    instance.media = tweet['media']
-                    instance.text = tweet['text']
-                    session.add(instance)
-                    session.commit()
-                    handle.profile_image_url = tweet['user_profile_image_url']
-                    handle.screen_name = tweet['user_screen_name']
-                    session.add(handle)
-                    session.commit()
-                    session.refresh(handle)
-            log.write(10, len(tweets), 2)
-        session.query(models.tweet).filter(
-            models.tweet.created_at <= seven_days_ago
-        ).delete(synchronize_session=False)
-        session.commit()
-
-
-def test():
-    return get_tweets('from:TwoBitsNash')
 
 
 def get_facebook(url):
@@ -241,7 +186,6 @@ def get_tweet(tweet):
         user_screen_name = tweet.xpath('.//@data-name').extract()[0]
     except ValueError:
         pass
-    '''
     if not media:
         for url in findall(
             r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'
@@ -260,7 +204,6 @@ def get_tweet(tweet):
                 media = get_instagram(url)
                 if media:
                     break
-    '''
     if (
         created_at
         and

@@ -8,11 +8,7 @@ CREATE TABLE IF NOT EXISTS `settings` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `key` (`key`)
 )
-ENGINE=InnoDB
-DEFAULT
-CHARSET=utf8
-COLLATE=utf8_unicode_ci
-AUTO_INCREMENT=0;
+ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE IF NOT EXISTS `categories` (
@@ -23,11 +19,7 @@ CREATE TABLE IF NOT EXISTS `categories` (
     UNIQUE KEY `name` (`name`),
     KEY `position` (`position`)
 )
-ENGINE=InnoDB
-DEFAULT
-CHARSET=utf8
-COLLATE=utf8_unicode_ci
-AUTO_INCREMENT=0;
+ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 DROP TABLE IF EXISTS `handles`;
 CREATE TABLE IF NOT EXISTS `handles` (
@@ -41,11 +33,7 @@ CREATE TABLE IF NOT EXISTS `handles` (
     KEY `profile_image_url` (`profile_image_url`),
     KEY `screen_name` (`screen_name`)
 )
-ENGINE=InnoDB
-DEFAULT
-CHARSET=utf8
-COLLATE=utf8_unicode_ci
-AUTO_INCREMENT=0;
+ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 DROP TABLE IF EXISTS `categories_handles`;
 CREATE TABLE IF NOT EXISTS `categories_handles` (
@@ -55,11 +43,7 @@ CREATE TABLE IF NOT EXISTS `categories_handles` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `category_id_handle_id` (`category_id`, `handle_id`)
 )
-ENGINE=InnoDB
-DEFAULT
-CHARSET=utf8
-COLLATE=utf8_unicode_ci
-AUTO_INCREMENT=0;
+ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 DROP TABLE IF EXISTS `tweets`;
 CREATE TABLE IF NOT EXISTS `tweets` (
@@ -71,31 +55,27 @@ CREATE TABLE IF NOT EXISTS `tweets` (
     PRIMARY KEY (`id`),
     KEY `created_at` (`created_at`)
 )
-ENGINE=InnoDB
-DEFAULT
-CHARSET=utf8
-COLLATE=utf8_unicode_ci
-AUTO_INCREMENT=0;
+ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 ALTER TABLE `categories_handles`
-ADD CONSTRAINT `categories_handles_category_id`
-FOREIGN KEY (`category_id`)
-REFERENCES `categories` (`id`)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+    ADD CONSTRAINT `categories_handles_category_id`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `categories` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE;
 
 ALTER TABLE `categories_handles`
-ADD CONSTRAINT `categories_handles_handle_id`
-FOREIGN KEY (`handle_id`)
-REFERENCES `handles` (`id`)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+    ADD CONSTRAINT `categories_handles_handle_id`
+    FOREIGN KEY (`handle_id`)
+    REFERENCES `handles` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE;
 
 ALTER TABLE `tweets`
-ADD CONSTRAINT `tweets_handle_id`
-FOREIGN KEY (`handle_id`)
-REFERENCES `handles` (`id`)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+    ADD CONSTRAINT `tweets_handle_id`
+    FOREIGN KEY (`handle_id`)
+    REFERENCES `handles` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE;
 
 SET FOREIGN_KEY_CHECKS = 1;
