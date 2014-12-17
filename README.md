@@ -60,8 +60,8 @@ crontab
 -------
 
 ```
-0 * * * * cd {{ path }}/scripts && {{ virtualenv }}/python manager.py process_1
-0 * * * * cd {{ path }}/scripts && {{ virtualenv }}/python manager.py process_2
+0 * * * * cd {{ path }} && {{ virtualenv }}/python manager.py process_1
+0 * * * * cd {{ path }} && {{ virtualenv }}/python manager.py process_2
 ```
 
 supervisor
