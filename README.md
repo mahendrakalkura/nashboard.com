@@ -68,7 +68,7 @@ supervisor
 ----------
 
 ```
-# nashboard.com_twitter.conf
+// nashboard.com_twitter.conf
 [program:nashboard.com_twitter]
 autorestart=true
 autostart=true
@@ -81,7 +81,7 @@ user={{ user }}
 ```
 
 ```
-# nashboard.com_uwsgi.conf
+// nashboard.com_uwsgi.conf
 [program:nashboard.com_uwsgi]
 autorestart=true
 autostart=true
