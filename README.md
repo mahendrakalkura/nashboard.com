@@ -5,6 +5,7 @@ Step 1:
 -------
 
 ```
+$ cd nashboard.com
 $ git clone git@bitbucket.org:bearcott/nashboard.com.git .
 ```
 
