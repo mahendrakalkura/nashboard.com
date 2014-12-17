@@ -52,7 +52,6 @@ def twitter_1(id):
         if not tweets:
             tweets = twitter.get_tweets(handle.name)
         seven_days_ago = datetime.now() - timedelta(days=7)
-        print tweets
         for tweet in tweets:
             if tweet['text'].startswith('@'):
                 continue
