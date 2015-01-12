@@ -71,6 +71,8 @@ def twitter_1(id):
                 instance.created_at = tweet['created_at']
                 instance.media = tweet['media']
                 instance.text = tweet['text']
+                instance.favorites = tweet['favorites']
+                instance.retweets = tweet['retweets']
                 session.add(instance)
                 session.commit()
                 handle.profile_image_url = tweet['user_profile_image_url']
@@ -112,7 +114,7 @@ def process_2():
 @manager.command
 @decorators.profile(0)
 def twitter_2():
-    pprint(twitter.get_tweets('from:TwoBitsNash'))
+    pprint(twitter.get_tweets('from:NashFoodTrucks'))
 
 if __name__ == '__main__':
     manager.run()
