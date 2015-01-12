@@ -7,8 +7,4 @@ CREATE TABLE IF NOT EXISTS `visitors` (
     UNIQUE KEY `email` (`email`),
     KEY `timestamp` (`timestamp`)
 )
-ENGINE=InnoDB
-DEFAULT
-CHARSET=utf8
-COLLATE=utf8_unicode_ci
-AUTO_INCREMENT=0;
+ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;

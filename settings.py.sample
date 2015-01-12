@@ -2,6 +2,10 @@
 
 from datetime import timedelta
 
+# Celery
+
+BROKER = 'amqp://guest@localhost//'
+
 # Flask
 
 DEBUG = False
