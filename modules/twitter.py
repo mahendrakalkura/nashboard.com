@@ -141,8 +141,10 @@ def get_tweets(q):
 def get_tweet(tweet):
     id = ''
     created_at = ''
+    favorites = ''
     media = ''
     text = ''
+    retweets = ''
     user_name = ''
     user_profile_image_url = ''
     user_screen_name = ''
@@ -158,6 +160,13 @@ def get_tweet(tweet):
     except IndexError:
         pass
     try:
+        favorites = tweet.xpath(
+            './/span[@class="ProfileTweet-action--favorite u-hiddenVisually"]/'
+            'span[@class="ProfileTweet-actionCount"]/@data-tweet-stat-count'
+        ).extract()[0].strip()
+    except IndexError:
+        pass
+    try:
         media = tweet.xpath(
             './/a[@data-resolved-url-large]/@data-resolved-url-large'
         ).extract()[0]
@@ -168,6 +177,14 @@ def get_tweet(tweet):
             './/div[@class="content"]/p[@class="js-tweet-text tweet-text"]'
         ).xpath(
             'string()'
+        ).extract()[0].strip()
+    except IndexError:
+        pass
+    try:
+        retweets = tweet.xpath(
+            './/span[@class="ProfileTweet-action--retweet u-hiddenVisually"]'
+            '/span[@class="ProfileTweet-actionCount"]/'
+            '@data-tweet-stat-count'
         ).extract()[0].strip()
     except IndexError:
         pass
@@ -227,8 +244,10 @@ def get_tweet(tweet):
     ):
         return {
             'created_at': created_at,
+            'favorites': favorites,
             'id': id,
             'media': media or '',
+            'retweets': retweets,
             'text': text,
             'user_name': user_name,
             'user_profile_image_url': user_profile_image_url,
