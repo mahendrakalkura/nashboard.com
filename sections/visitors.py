@@ -60,7 +60,9 @@ def ajax():
         query = query.filter(models.handle.neighborhood_id == neighborhood.id)
     counts = {}
     tweets = []
-    for tweet in query.order_by('created_at desc'):
+    for tweet in query.order_by(
+        'favorites desc, retweets desc, created_at desc'
+    ):
         if (
             category.name == 'Happy Hours'
             and
@@ -83,6 +85,8 @@ def ajax():
             'handle_screen_name': tweet.handle.screen_name,
             'handle_name': tweet.handle.name,
             'id': tweet.id,
+            'favorites': tweet.favorites,
+            'retweets': tweet.retweets,
             'media': tweet.media,
             'text': linkify(tweet.text, [
                 callback,
