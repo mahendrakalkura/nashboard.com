@@ -17,6 +17,12 @@
                 <p class="created_at" title="{{ tweet.created_at }}">
                     {{ tweet.created_at }}
                 </p>
+                <p class="retweets" title="{{ tweet.retweets }}">
+                    Retweets: {{ tweet.retweets }}
+                </p>
+                <p class="favorites" title="{{ tweet.favorites }}">
+                    Favorites: {{ tweet.favorites }}
+                </p>
             </div>
             <div class="col-sm-7 part body">
                 <p class="text">{{ tweet.text|safe }}</p>
