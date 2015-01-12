@@ -81,13 +81,13 @@ def ajax():
             continue
         tweets.append({
             'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
+            'favorites': tweet.favorites,
             'handle_profile_image_url': tweet.handle.profile_image_url,
             'handle_screen_name': tweet.handle.screen_name,
             'handle_name': tweet.handle.name,
             'id': tweet.id,
-            'favorites': tweet.favorites,
-            'retweets': tweet.retweets,
             'media': tweet.media,
+            'retweets': tweet.retweets,
             'text': linkify(tweet.text, [
                 callback,
             ], parse_email=False, skip_pre=False),
