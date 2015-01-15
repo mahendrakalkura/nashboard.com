@@ -13,11 +13,12 @@ from flask import (
     url_for
 )
 from pytz import utc
+from difflib import SequenceMatcher
 
 from modules import forms
 from modules import models
 from modules import utilities
-
+from re import compile, match
 blueprint = Blueprint('visitors', __name__)
 
 
@@ -60,9 +61,11 @@ def ajax():
         query = query.filter(models.handle.neighborhood_id == neighborhood.id)
     counts = {}
     tweets = []
+    texts = []
     for tweet in query.order_by(
-        'favorites desc, retweets desc, created_at desc'
+        'created_at asc, favorites desc, retweets desc'
     ):
+
         if (
             category.name == 'Happy Hours'
             and
@@ -79,21 +82,62 @@ def ajax():
             counts[tweet.handle.screen_name] = 0
         if counts[tweet.handle.screen_name] >= 5:
             continue
-        tweets.append({
-            'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
-            'favorites': tweet.favorites,
-            'handle_profile_image_url': tweet.handle.profile_image_url,
-            'handle_screen_name': tweet.handle.screen_name,
-            'handle_name': tweet.handle.name,
-            'id': tweet.id,
-            'media': tweet.media,
-            'retweets': tweet.retweets,
-            'text': linkify(tweet.text, [
-                callback,
-            ], parse_email=False, skip_pre=False),
-        })
+        if (
+            category.name == "Food & Beverage"
+            or
+            category.name == "Music"
+        ):
+            text = compile(r'\W+')
+            text = text.split(tweet.text)
+            if match("[a-zA-Z0-9]", text[0]):
+                text = len(text)
+            else:
+                text = len(text)-1
+            if text < 7:
+                continue
+            if (
+                tweet.text[0] == '"'
+                or
+                tweet.text[0] == '.'
+            ):
+                continue
+            count = 0
+            if texts:
+                for text in texts:
+                    if(similar(text, tweet.text) > 0.67):
+                        count += 1
+            if count >= 1:
+                continue
+            tweets.append({
+                'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
+                'favorites': tweet.favorites,
+                'handle_profile_image_url': tweet.handle.profile_image_url,
+                'handle_screen_name': tweet.handle.screen_name,
+                'handle_name': tweet.handle.name,
+                'id': tweet.id,
+                'media': tweet.media,
+                'retweets': tweet.retweets,
+                'text': linkify(tweet.text, [
+                    callback,
+                ], parse_email=False, skip_pre=False),
+            })
+            texts.append(tweet.text)
+        else:
+            tweets.append({
+                'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
+                'favorites': tweet.favorites,
+                'handle_profile_image_url': tweet.handle.profile_image_url,
+                'handle_screen_name': tweet.handle.screen_name,
+                'handle_name': tweet.handle.name,
+                'id': tweet.id,
+                'media': tweet.media,
+                'retweets': tweet.retweets,
+                'text': linkify(tweet.text, [
+                    callback,
+                ], parse_email=False, skip_pre=False),
+            })
         counts[tweet.handle.screen_name] += 1
-    return render_template('visitors/views/ajax.html', tweets=tweets)
+    return render_template('visitors/views/ajax.html', tweets=reversed(tweets))
 
 
 @blueprint.route('/stay-in-touch', methods=['GET', 'POST'])
@@ -125,3 +169,6 @@ def callback(attrs, new=False):
     attrs['rel'] = 'nofollow'
     attrs['target'] = '_blank'
     return attrs
+
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
