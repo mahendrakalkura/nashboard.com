@@ -65,7 +65,6 @@ def ajax():
     for tweet in query.order_by(
         'created_at asc, favorites desc, retweets desc'
     ):
-
         if (
             category.name == 'Happy Hours'
             and

@@ -11,7 +11,7 @@ patterns = {
     'happy_hours': compile(
         'happy hour|drink deal|two for one|two-4-one|two-for-1|two-4-1|'
         'two-for-one|2-4-one|2-4-1|2-for-one|2-for-1|241|happy hr|happy hours|'
-        'happy-hr|happy-hours|happy-hour|drink-deal',
+        'happy-hr|happy-hours|happy-hour|drink-deal|#happyhour',
         IGNORECASE
     ),
     'retweet': compile(' RT | RT @| RT@|^RT', IGNORECASE),
