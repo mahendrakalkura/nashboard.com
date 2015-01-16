@@ -113,7 +113,7 @@ jQuery(function () {
 
     var handles_refresh = function (category_id) {
         timeout = window.setTimeout(function () {
-            ajax(category_id);
+            handles_ajax(category_id);
         }, 30000);
     };
 
