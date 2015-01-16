@@ -54,7 +54,64 @@ jQuery(function () {
         );
     };
 
+    var handles_ajax = function (category_id) {
+        window.location.hash = '#' + category_id;
+        var dashboard = jQuery('#dashboard');
+        var tweets = dashboard.find('#tweets');
+        var failure_1 = dashboard.find('#failure_1');
+        var failure_2 = dashboard.find('#failure_2');
+        var overlay = jQuery('#overlay');
+        var spinner = jQuery('#spinner');
+        failure_1.addClass('hide');
+        failure_2.addClass('hide');
+        overlay.removeClass('hide');
+        spinner.removeClass('hide');
+        jQuery.ajax({
+            cache: false,
+            data: {
+                category_id: category_id,
+                neighborhood_id: neighborhood_id.val()
+            },
+            timeout: 30000,
+            type: 'POST',
+            url: dashboard.attr('data-url')
+        }).then(
+            function (data, textStatus, jqXHR) {
+                overlay.addClass('hide');
+                spinner.addClass('hide');
+                jQuery(
+                    jQuery(data).find('.tweet').get().reverse()
+                ).each(function () {
+                    var $this = jQuery(this);
+                    if (tweets.find(
+                        '.tweet[data-id="' + $this.attr('data-id') + '"]'
+                    ).length) {
+                        return;
+                    }
+                    $this.find('.created_at').timeago();
+                    tweets.prepend($this);
+                });
+                if (!tweets.find('.tweet').length) {
+                    failure_2.removeClass('hide');
+                }
+                handles_refresh(category_id);
+            },
+            function (jqXHR, textStatus, errorThrown) {
+                overlay.addClass('hide');
+                spinner.addClass('hide');
+                failure_1.removeClass('hide');
+                handles_refresh(category_id);
+            }
+        );
+    };
+
     var refresh = function (category_id) {
+        timeout = window.setTimeout(function () {
+            ajax(category_id);
+        }, 30000);
+    };
+
+    var handles_refresh = function (category_id) {
         timeout = window.setTimeout(function () {
             ajax(category_id);
         }, 30000);

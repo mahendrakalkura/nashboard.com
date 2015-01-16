@@ -108,7 +108,9 @@ def ajax():
             if count >= 1:
                 continue
             tweets.append({
-                'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
+                'created_at': tweet.created_at.replace(
+                    tzinfo=utc
+                ).isoformat(' '),
                 'favorites': tweet.favorites,
                 'handle_profile_image_url': tweet.handle.profile_image_url,
                 'handle_screen_name': tweet.handle.screen_name,
@@ -123,7 +125,9 @@ def ajax():
             texts.append(tweet.text)
         else:
             tweets.append({
-                'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
+                'created_at': tweet.created_at.replace(
+                    tzinfo=utc
+                ).isoformat(' '),
                 'favorites': tweet.favorites,
                 'handle_profile_image_url': tweet.handle.profile_image_url,
                 'handle_screen_name': tweet.handle.screen_name,
@@ -139,6 +143,45 @@ def ajax():
     return render_template('visitors/views/ajax.html', tweets=reversed(tweets))
 
 
+@blueprint.route('/handles/<name>/ajax', methods=['POST'])
+def handles_ajax(name):
+    handle = g.mysql.query(
+        models.handle
+    ).filter(
+        models.handle.name == name
+    ).first()
+    if not handle:
+        abort(404)
+    query = g.mysql.query(
+        models.tweet,
+    ).filter(
+        models.tweet.handle_id == handle.id,
+        models.tweet.created_at <= datetime.now(),
+    )
+    tweets = []
+    for tweet in query.order_by(
+        'favorites desc, retweets desc, created_at desc'
+    ):
+        tweets.append({
+            'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
+            'favorites': tweet.favorites,
+            'handle_profile_image_url': tweet.handle.profile_image_url,
+            'handle_screen_name': tweet.handle.screen_name,
+            'handle_name': tweet.handle.name,
+            'id': tweet.id,
+            'media': tweet.media,
+            'retweets': tweet.retweets,
+            'text': linkify(tweet.text, [
+                callback,
+            ], parse_email=False, skip_pre=False),
+        })
+    return render_template(
+        'visitors/views/handles_ajax.html',
+        handle=handle,
+        tweets=tweets
+    )
+
+
 @blueprint.route('/stay-in-touch', methods=['GET', 'POST'])
 def stay_in_touch():
     visitor = models.visitor()
@@ -152,22 +195,38 @@ def stay_in_touch():
             return redirect(url_for('visitors.stay_in_touch'))
         flash('There was a problem..', 'danger')
     if request.args.get('f'):
-        flash("We're still under development! Check back later for updates!",'warning')
+        flash("We're still under development! Check back later for updates!", 'warning')
 
     return render_template('visitors/views/stay_in_touch.html', form=form)
+
 
 @blueprint.route('/privacy-policy')
 def privacy_policy():
     return render_template('visitors/views/privacy_policy.html')
 
+
 @blueprint.route('/about')
 def about():
     return render_template('visitors/views/about.html')
+
+
+@blueprint.route('/handles/<name>')
+def handles(name):
+    handle = g.mysql.query(
+        models.handle
+    ).filter(
+        models.handle.name == name
+    ).first()
+    if not handle:
+        abort(404)
+    return render_template('visitors/views/handles.html', handle=handle)
+
 
 def callback(attrs, new=False):
     attrs['rel'] = 'nofollow'
     attrs['target'] = '_blank'
     return attrs
+
 
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()

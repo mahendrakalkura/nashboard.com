@@ -1,0 +1,20 @@
+{% extends 'visitors/layout.html' %}
+
+{% set title = 'Nashboard' %}
+
+{% block component %}
+    <div class="row"
+        id="dashboard"
+        data-url="{{ url_for('visitors.handles_ajax', name=handle.name) }}"
+        >
+        <div id="tweets"></div>
+        <div class="alert alert-danger" id="failure_1">
+            <i class="fa fa-fw fa-exclamation-triangle"></i>
+            An unknown error has occurred. Please try again.
+        </div>
+        <div class="alert alert-danger" id="failure_2">
+            <i class="fa fa-fw fa-exclamation-triangle"></i>
+            There are no tweets in the database. Please try again.
+        </div>
+    </div>
+{% endblock %}
