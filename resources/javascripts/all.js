@@ -145,6 +145,7 @@ jQuery(function () {
             jQuery('.nav li').removeClass('active');
             $this.parent().addClass('active');
             ajax($this.attr('data-id'));
+            handles_ajax($this.attr('data-id'));
 
             //hide the navbar after click
             if (jQuery('.navbar-toggle').css('display') != 'none' && jQuery('.navbar-collapse').hasClass('in'))
