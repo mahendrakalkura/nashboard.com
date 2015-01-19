@@ -164,4 +164,5 @@ jQuery(function () {
             return false;
         }).change();
     }
+    jQuery('#summary').wysihtml5();
 });
