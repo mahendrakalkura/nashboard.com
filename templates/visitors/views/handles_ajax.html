@@ -3,17 +3,17 @@
         <div class="tweet row" data-id="{{ tweet.id }}">
             <div class="col-sm-3 part info">
                 <a
-                    class="handle_profile_image_url"
-                    href="https://twitter.com/{{ tweet.handle_name }}"
+                    class="user_profile_image_url"
+                    href="https://twitter.com/{{ tweet.user_name }}"
                     target="_blank"
                     >
-                    <img src="{{ tweet.handle_profile_image_url}}">
+                    <img src="{{ tweet.user_profile_image_url}}">
                 </a>
                 <a
-                    class="handle_screen_name"
-                    href="https://twitter.com/{{ tweet.handle_name }}"
+                    class="user_screen_name"
+                    href="https://twitter.com/{{ tweet.user_name }}"
                     target="_blank"
-                    >{{ tweet.handle_screen_name }}</a>
+                    >{{ tweet.user_screen_name }}</a>
                 <p class="created_at" title="{{ tweet.created_at }}">
                     {{ tweet.created_at }}
                 </p>

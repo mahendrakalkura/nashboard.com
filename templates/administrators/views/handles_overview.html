@@ -84,7 +84,7 @@
                                     {{ handle.neighborhood.name }}
                                 </td>
                                 <td class="narrow text-right">
-                                    {{ counts[handle.screen_name]|format_integer }}
+                                    {{ handle.get_tweets()|format_integer }}
                                 </td>
                                 <td class="actions narrow">
                                     <a

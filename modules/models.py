@@ -139,6 +139,13 @@ class handle(database.base):
         ),
     )
 
+    def get_tweets(self):
+        return g.mysql.query(
+            tweet
+        ).filter(
+            tweet.user_screen_name == self.screen_name
+        ).count()
+
 
 class category_handle(database.base):
     __tablename__ = 'categories_handles'

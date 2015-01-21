@@ -258,16 +258,6 @@ def handles_overview():
     form = forms.handles_filters(**filters)
     query = form.apply(g.mysql.query(models.handle))
     pager = classes.pager(query.count(), limit, page)
-    handles = query.order_by('%(column)s %(direction)s' % order_by).all()[
-        pager.prefix:pager.suffix
-    ]
-    counts = {}
-    for handle in handles:
-        counts[handle.screen_name] = g.mysql.query(
-            models.tweet
-        ).filter(
-            models.tweet.user_screen_name == handle.screen_name
-        ).count()
     return render_template(
         'administrators/views/handles_overview.html',
         form=form,
@@ -275,8 +265,7 @@ def handles_overview():
             pager.prefix:pager.suffix
         ],
         order_by=order_by,
-        pager=pager,
-        counts=counts
+        pager=pager
     )
 
 

@@ -118,9 +118,9 @@ def ajax():
                     tzinfo=utc
                 ).isoformat(' '),
                 'favorites': tweet.favorites,
-                'handle_profile_image_url': tweet.user_profile_image_url,
-                'handle_screen_name': tweet.user_screen_name,
-                'handle_name': tweet.user_name,
+                'user_profile_image_url': tweet.user_profile_image_url,
+                'user_screen_name': tweet.user_screen_name,
+                'user_name': tweet.user_name,
                 'id': tweet.id,
                 'media': tweet.media,
                 'retweets': tweet.retweets,
@@ -135,9 +135,9 @@ def ajax():
                     tzinfo=utc
                 ).isoformat(' '),
                 'favorites': tweet.favorites,
-                'handle_profile_image_url': tweet.user_profile_image_url,
-                'handle_screen_name': tweet.user_screen_name,
-                'handle_name': tweet.user_name,
+                'user_profile_image_url': tweet.user_profile_image_url,
+                'user_screen_name': tweet.user_screen_name,
+                'user_name': tweet.user_name,
                 'id': tweet.id,
                 'media': tweet.media,
                 'retweets': tweet.retweets,
@@ -154,14 +154,14 @@ def handles_ajax(name):
     handle = g.mysql.query(
         models.handle
     ).filter(
-        models.handle.name == name
+        models.handle.screen_name == name
     ).first()
     if not handle:
         abort(404)
     query = g.mysql.query(
         models.tweet,
     ).filter(
-        models.tweet.text.like('%%%(screen_name)s%%' % {
+        models.tweet.text.like('%%@%(screen_name)s%%' % {
             'screen_name': handle.screen_name,
         }),
         models.tweet.created_at <= datetime.now(),
@@ -173,9 +173,9 @@ def handles_ajax(name):
         tweets.append({
             'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
             'favorites': tweet.favorites,
-            'handle_profile_image_url': tweet.user_profile_image_url,
-            'handle_screen_name': tweet.user_screen_name,
-            'handle_name': tweet.user_name,
+            'user_profile_image_url': tweet.user_profile_image_url,
+            'user_screen_name': tweet.user_screen_name,
+            'user_name': tweet.user_name,
             'id': tweet.id,
             'media': tweet.media,
             'retweets': tweet.retweets,
@@ -226,7 +226,7 @@ def handles(name):
     handle = g.mysql.query(
         models.handle
     ).filter(
-        models.handle.name == name
+        models.handle.screen_name == name
     ).first()
     if not handle:
         abort(404)
