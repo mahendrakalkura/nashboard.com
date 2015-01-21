@@ -31,14 +31,20 @@ class category(database.base):
         return ''
 
     def get_tweets(self):
-        return g.mysql.query(
-            tweet,
-        ).join(
+        screen_names = []
+        for instance in g.mysql.query(
             handle,
         ).join(
             category_handle,
         ).filter(
             category_handle.category == self,
+        ).all():
+            screen_names.append(instance.screen_name)
+
+        return g.mysql.query(
+            tweet,
+        ).filter(
+            tweet.user_screen_name.in_(screen_names)
         ).count()
 
     def get_position(self):
@@ -161,11 +167,6 @@ class tweet(database.base):
         'autoload': True,
     }
 
-    handle = relationship(
-        'handle',
-        backref=backref('tweets', cascade='all,delete-orphan', lazy='dynamic'),
-    )
-
 
 class visitor(database.base):
     __tablename__ = 'visitors'
@@ -176,6 +177,7 @@ class visitor(database.base):
     def __init__(self, *args, **kwargs):
         super(visitor, self).__init__(*args, **kwargs)
         self.timestamp = datetime.now()
+
 
 def swap(one, two):
     one.position, two.position = two.position, one.position

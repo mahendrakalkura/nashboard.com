@@ -67,10 +67,24 @@ class handles_form(Form):
             validators.unique(table='handles', columns=[]),
         ],
     )
+    screen_name = TextField(
+        label='Screen Name',
+        validators=[
+            validators.required(),
+            validators.unique(table='handles', columns=[]),
+        ],
+    )
     summary = TextAreaField(
         default='A brief summary of the handle.....',
         validators=[validators.required()],
         widget=widgets.textarea(rows=10),
+    )
+    profile_image_url = TextField(
+        label='Image URL',
+        validators=[
+            validators.required(),
+            validators.unique(table='handles', columns=[]),
+        ],
     )
     categories = QuerySelectMultipleField(
         allow_blank=False,
@@ -85,7 +99,9 @@ class handles_form(Form):
     def get_instance(self, handle):
         handle.neighborhood = self.neighborhood.data
         handle.name = self.name.data
+        handle.screen_name = self.screen_name.data
         handle.categories = self.categories.data
+        handle.profile_image_url = self.profile_image_url.data
         handle.summary = self.summary.data
         return handle
 

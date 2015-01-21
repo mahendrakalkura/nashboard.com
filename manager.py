@@ -29,7 +29,7 @@ celery.conf.update(
     CELERY_IGNORE_RESULT=True,
     CELERY_RESULT_SERIALIZER='json',
     CELERY_TASK_SERIALIZER='json',
-    CELERYD_LOG_FORMAT= '[%(asctime)s: %(levelname)s] %(message)s',
+    CELERYD_LOG_FORMAT='[%(asctime)s: %(levelname)s] %(message)s',
     CELERYD_POOL_RESTARTS=True,
     CELERYD_PREFETCH_MULTIPLIER=1,
     CELERYD_TASK_SOFT_TIME_LIMIT=3600,
@@ -41,16 +41,19 @@ manager = Manager(application, with_default_commands=False)
 
 @celery.task
 def twitter_1(id):
+    log.write(10, id, 1)
     with closing(database.session()) as session:
         handle = session.query(models.handle).get(id)
-        log.write(10, handle.name, 1)
+        log.write(10, handle.screen_name, 1)
         tweets = []
-        if not tweets:
-            tweets = twitter.get_tweets('from:%(name)s' % {
-                'name': handle.name,
-            })
-        if not tweets:
-            tweets = twitter.get_tweets(handle.name)
+        for tweet in twitter.get_tweets('from:%(screen_name)s' % {
+            'screen_name': handle.screen_name,
+        }):
+            tweets.append(tweet)
+        for tweet in twitter.get_tweets('@%(screen_name)s' % {
+            'screen_name': handle.screen_name,
+        }):
+            tweets.append(tweet)
         seven_days_ago = datetime.now() - timedelta(days=7)
         for tweet in tweets:
             if tweet['text'].startswith('@'):
@@ -61,23 +64,23 @@ def twitter_1(id):
                 continue
             if tweet['created_at'] <= seven_days_ago:
                 continue
-            if tweet['user_name'] == handle.name:
+            if tweet['user_screen_name'] == handle.screen_name:
                 instance = session.query(models.tweet).get(tweet['id'])
                 if not instance:
                     instance = models.tweet(**{
                         'id': tweet['id'],
                     })
-                instance.handle = handle
+                instance.user_name = tweet['user_name']
+                instance.user_profile_image_url = tweet[
+                    'user_profile_image_url'
+                ]
+                instance.user_screen_name = tweet['user_screen_name']
                 instance.created_at = tweet['created_at']
-                instance.media = tweet['media']
-                instance.text = tweet['text']
                 instance.favorites = tweet['favorites']
+                instance.media = tweet['media']
                 instance.retweets = tweet['retweets']
+                instance.text = tweet['text']
                 session.add(instance)
-                session.commit()
-                handle.profile_image_url = tweet['user_profile_image_url']
-                handle.screen_name = tweet['user_screen_name']
-                session.add(handle)
                 session.commit()
                 session.refresh(handle)
         log.write(10, len(tweets), 2)

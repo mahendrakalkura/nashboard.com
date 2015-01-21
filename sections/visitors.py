@@ -42,23 +42,29 @@ def ajax():
     category = g.mysql.query(models.category).get(request.form['category_id'])
     if not category:
         abort(404)
+    screen_names = []
     query = g.mysql.query(
-        models.tweet,
-    ).join(
         models.handle,
     ).join(
-        models.category_handle,
+        models.category_handle
     ).filter(
         models.category_handle.category == category,
-        models.tweet.created_at
-        >=
-        datetime.now() - timedelta(seconds=category.ttl),
     )
     neighborhood = g.mysql.query(
         models.neighborhood,
     ).get(request.form['neighborhood_id'])
     if neighborhood:
         query = query.filter(models.handle.neighborhood_id == neighborhood.id)
+    for handle in query.all():
+        screen_names.append(handle.screen_name)
+    query = g.mysql.query(
+        models.tweet,
+    ).filter(
+        models.tweet.user_screen_name.in_(screen_names),
+        models.tweet.created_at
+        >=
+        datetime.now() - timedelta(seconds=category.ttl),
+    )
     counts = {}
     tweets = []
     texts = []
@@ -77,9 +83,9 @@ def ajax():
             not utilities.is_trivia(category.name, tweet.text)
         ):
             continue
-        if not tweet.handle.screen_name in counts:
-            counts[tweet.handle.screen_name] = 0
-        if counts[tweet.handle.screen_name] >= 5:
+        if not tweet.user_screen_name in counts:
+            counts[tweet.user_screen_name] = 0
+        if counts[tweet.user_screen_name] >= 5:
             continue
         if (
             category.name == "Food & Beverage"
@@ -112,9 +118,9 @@ def ajax():
                     tzinfo=utc
                 ).isoformat(' '),
                 'favorites': tweet.favorites,
-                'handle_profile_image_url': tweet.handle.profile_image_url,
-                'handle_screen_name': tweet.handle.screen_name,
-                'handle_name': tweet.handle.name,
+                'handle_profile_image_url': tweet.user_profile_image_url,
+                'handle_screen_name': tweet.user_screen_name,
+                'handle_name': tweet.user_name,
                 'id': tweet.id,
                 'media': tweet.media,
                 'retweets': tweet.retweets,
@@ -129,9 +135,9 @@ def ajax():
                     tzinfo=utc
                 ).isoformat(' '),
                 'favorites': tweet.favorites,
-                'handle_profile_image_url': tweet.handle.profile_image_url,
-                'handle_screen_name': tweet.handle.screen_name,
-                'handle_name': tweet.handle.name,
+                'handle_profile_image_url': tweet.user_profile_image_url,
+                'handle_screen_name': tweet.user_screen_name,
+                'handle_name': tweet.user_name,
                 'id': tweet.id,
                 'media': tweet.media,
                 'retweets': tweet.retweets,
@@ -139,7 +145,7 @@ def ajax():
                     callback,
                 ], parse_email=False, skip_pre=False),
             })
-        counts[tweet.handle.screen_name] += 1
+        counts[tweet.user_screen_name] += 1
     return render_template('visitors/views/ajax.html', tweets=reversed(tweets))
 
 
@@ -155,7 +161,9 @@ def handles_ajax(name):
     query = g.mysql.query(
         models.tweet,
     ).filter(
-        models.tweet.handle_id == handle.id,
+        models.tweet.text.like('%%%(screen_name)s%%' % {
+            'screen_name': handle.screen_name,
+        }),
         models.tweet.created_at <= datetime.now(),
     )
     tweets = []
@@ -165,9 +173,9 @@ def handles_ajax(name):
         tweets.append({
             'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
             'favorites': tweet.favorites,
-            'handle_profile_image_url': tweet.handle.profile_image_url,
-            'handle_screen_name': tweet.handle.screen_name,
-            'handle_name': tweet.handle.name,
+            'handle_profile_image_url': tweet.user_profile_image_url,
+            'handle_screen_name': tweet.user_screen_name,
+            'handle_name': tweet.user_name,
             'id': tweet.id,
             'media': tweet.media,
             'retweets': tweet.retweets,
@@ -195,7 +203,10 @@ def stay_in_touch():
             return redirect(url_for('visitors.stay_in_touch'))
         flash('There was a problem..', 'danger')
     if request.args.get('f'):
-        flash("We're still under development! Check back later for updates!", 'warning')
+        flash(
+            "We're still under development! Check back later for updates!",
+            'warning'
+        )
 
     return render_template('visitors/views/stay_in_touch.html', form=form)
 

@@ -189,7 +189,7 @@ def get_tweet(tweet):
     except IndexError:
         pass
     try:
-        user_name = tweet.xpath('.//@data-screen-name').extract()[0]
+        user_name = tweet.xpath('.//@data-name').extract()[0]
     except IndexError:
         pass
     try:
@@ -200,7 +200,7 @@ def get_tweet(tweet):
     except IndexError:
         pass
     try:
-        user_screen_name = tweet.xpath('.//@data-name').extract()[0]
+        user_screen_name = tweet.xpath('.//@data-screen-name').extract()[0]
     except ValueError:
         pass
     if not media:

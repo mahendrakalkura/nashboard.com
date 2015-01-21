@@ -67,13 +67,13 @@
                                 <td>
                                     {% if handle.screen_name %}
                                         <a
-                                            href="http://twitter.com/{{ handle.name }}"
+                                            href="http://twitter.com/{{ handle.screen_name }}"
                                             target="_blank"
                                             >{{ handle.screen_name }}</a>
                                     {% endif %}
                                     <a
                                         class="pull-right"
-                                        href="http://twitter.com/{{ handle.name }}"
+                                        href="http://twitter.com/{{ handle.screen_name }}"
                                         target="_blank"
                                         >@{{ handle.name }}</a>
                                 </td>
@@ -84,7 +84,7 @@
                                     {{ handle.neighborhood.name }}
                                 </td>
                                 <td class="narrow text-right">
-                                    {{ handle.tweets.count()|format_integer }}
+                                    {{ counts[handle.screen_name]|format_integer }}
                                 </td>
                                 <td class="actions narrow">
                                     <a
