@@ -69,13 +69,13 @@
                                         <a
                                             href="http://twitter.com/{{ handle.screen_name }}"
                                             target="_blank"
-                                            >{{ handle.screen_name }}</a>
+                                            >{{ handle.name }}</a>
                                     {% endif %}
                                     <a
                                         class="pull-right"
                                         href="http://twitter.com/{{ handle.screen_name }}"
                                         target="_blank"
-                                        >@{{ handle.name }}</a>
+                                        >@{{ handle.screen_name }}</a>
                                 </td>
                                 <td class="narrow text-right">
                                     {{ handle.categories.count()|format_integer }}
