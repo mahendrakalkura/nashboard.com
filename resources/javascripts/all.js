@@ -164,5 +164,14 @@ jQuery(function () {
         jQuery('.top [name="neighborhood_id"]').hide();
         handles_ajax();
     }
-    jQuery('#summary').wysihtml5();
+    jQuery('#summary').wysihtml5({
+        'blockquote': true,
+        'color': true,
+        'emphasis': true,
+        'font-styles': true,
+        'html': true,
+        'image': true,
+        'link': true,
+        'lists': true,
+    });
 });
