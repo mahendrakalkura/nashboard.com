@@ -119,7 +119,7 @@ def get_tweets(q):
             break
         if not contents:
             break
-        if not 'items_html' in contents:
+        if 'items_html' not in contents:
             break
         for tweet in Selector(
             text=contents['items_html'],

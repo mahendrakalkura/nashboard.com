@@ -38,7 +38,7 @@ patterns = {
 
 
 def get_filters_order_by_limit_page(table, filters, order_by, limit, page):
-    if not table in session:
+    if table not in session:
         session[table] = {}
     if 'filters' in session[table]:
         filters = session[table]['filters']
@@ -56,7 +56,7 @@ def get_integer(value):
 
 
 def set_filters(table, form):
-    if not table in session:
+    if table not in session:
         session[table] = {}
     if request.form.get('submit', default='') == 'set':
         session[table]['filters'] = form(request.form).data
@@ -67,7 +67,7 @@ def set_filters(table, form):
 
 
 def set_order_by_limit_page(table):
-    if not table in session:
+    if table not in session:
         session[table] = {}
     if(
         'order_by_column' in request.args

@@ -2,7 +2,6 @@
 
 from datetime import datetime, timedelta
 from difflib import SequenceMatcher
-from re import compile, match
 
 from bleach import linkify
 from flask import (
@@ -78,7 +77,7 @@ def dashboard_ajax():
             not utilities.is_trivia(category.name, tweet.text)
         ):
             continue
-        if not tweet.user_screen_name in counts:
+        if tweet.user_screen_name not in counts:
             counts[tweet.user_screen_name] = 0
         if counts[tweet.user_screen_name] >= 5:
             continue

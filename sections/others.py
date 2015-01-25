@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from os import spawnl, P_NOWAIT
-
 from flask import Blueprint, render_template
 
 blueprint = Blueprint('others', __name__)
