@@ -3,10 +3,31 @@
 {% set title = 'Nashboard' %}
 
 {% block component %}
-    <div class="row"
-        id="dashboard"
-        data-url="{{ url_for('visitors.handles_ajax', name=handle.screen_name) }}"
+    <div
+        class="row"
+        data-url="{{ url_for('visitors.handles_ajax', screen_name=handle.screen_name) }}"
+        id="handles"
         >
+        <div class="tweet row">
+            <div class="col-sm-3 part info">
+                <a
+                    class="user_profile_image_url"
+                    href="https://twitter.com/{{ handle.screen_name }}"
+                    target="_blank"
+                    >
+                    <img src="{{ handle.profile_image_url}}">
+                </a>
+                <a
+                    class="user_screen_name"
+                    href="https://twitter.com/{{ handle.screen_name }}"
+                    target="_blank"
+                    >{{ handle.name }}</a>
+            </div>
+            <div class="col-sm-7 part body">
+                <p class="text">{{ handle.summary|safe }}</p>
+            </div>
+        </div>
+        <hr>
         <div id="tweets"></div>
         <div class="alert alert-danger" id="failure_1">
             <i class="fa fa-fw fa-exclamation-triangle"></i>

@@ -2,6 +2,7 @@
 
 from cStringIO import StringIO
 from csv import QUOTE_ALL, writer
+
 from flask import (
     abort,
     Blueprint,
@@ -9,8 +10,8 @@ from flask import (
     g,
     redirect,
     render_template,
-    Response,
     request,
+    Response,
     session,
     url_for,
 )
@@ -265,7 +266,7 @@ def handles_overview():
             pager.prefix:pager.suffix
         ],
         order_by=order_by,
-        pager=pager
+        pager=pager,
     )
 
 
@@ -315,7 +316,7 @@ def handles_delete(id):
         abort(404)
     if request.method == 'GET':
         return render_template(
-            'administrators/views/handles_delete.html', id=id
+            'administrators/views/handles_delete.html', id=id,
         )
     if request.method == 'POST':
         g.mysql.delete(handle)
@@ -347,48 +348,6 @@ def handles_process():
                     'failure'
                 )
     return redirect(url_for('administrators.handles_overview'))
-
-
-@blueprint.route('/profile', methods=['GET', 'POST'])
-@decorators.requires_administrator
-def profile():
-    form = forms.profile(request.form, username=g.mysql.query(
-        models.setting,
-    ).filter(
-        models.setting.key == 'username',
-    ).first().value)
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            form.persist()
-            flash('Your profile has been saved successfully.', 'success')
-            return redirect(url_for('administrators.profile'))
-        flash('Your profile has not been saved successfully.', 'danger')
-    return render_template('administrators/views/profile.html', form=form)
-
-
-@blueprint.route('/sign-in', methods=['GET', 'POST'])
-def sign_in():
-    if g.administrator:
-        return redirect(
-            request.args.get('next') or url_for('administrators.dashboard')
-        )
-    form = forms.sign_in(request.form)
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            flash('You have been signed in successfully.', 'success')
-            return redirect(
-                request.args.get('next') or url_for('administrators.dashboard')
-            )
-        flash('You have not been signed in successfully.', 'danger')
-    return render_template('administrators/views/sign_in.html', form=form)
-
-
-@blueprint.route('/sign-out')
-def sign_out():
-    if 'administrator' in session:
-        del session['administrator']
-    flash('You have been signed out successfully.', 'success')
-    return redirect(url_for('administrators.dashboard'))
 
 
 @blueprint.route('/visitors/overview', methods=['GET', 'POST'])
@@ -473,3 +432,45 @@ def visitors_export():
         },
         mimetype='text/csv',
     )
+
+
+@blueprint.route('/profile', methods=['GET', 'POST'])
+@decorators.requires_administrator
+def profile():
+    form = forms.profile(request.form, username=g.mysql.query(
+        models.setting,
+    ).filter(
+        models.setting.key == 'username',
+    ).first().value)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            form.persist()
+            flash('Your profile has been saved successfully.', 'success')
+            return redirect(url_for('administrators.profile'))
+        flash('Your profile has not been saved successfully.', 'danger')
+    return render_template('administrators/views/profile.html', form=form)
+
+
+@blueprint.route('/sign-in', methods=['GET', 'POST'])
+def sign_in():
+    if g.administrator:
+        return redirect(
+            request.args.get('next') or url_for('administrators.dashboard')
+        )
+    form = forms.sign_in(request.form)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            flash('You have been signed in successfully.', 'success')
+            return redirect(
+                request.args.get('next') or url_for('administrators.dashboard')
+            )
+        flash('You have not been signed in successfully.', 'danger')
+    return render_template('administrators/views/sign_in.html', form=form)
+
+
+@blueprint.route('/sign-out')
+def sign_out():
+    if 'administrator' in session:
+        del session['administrator']
+    flash('You have been signed out successfully.', 'success')
+    return redirect(url_for('administrators.dashboard'))

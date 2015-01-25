@@ -64,25 +64,22 @@ def twitter_1(id):
                 continue
             if tweet['created_at'] <= seven_days_ago:
                 continue
-            if tweet['user_screen_name'] == handle.screen_name:
-                instance = session.query(models.tweet).get(tweet['id'])
-                if not instance:
-                    instance = models.tweet(**{
-                        'id': tweet['id'],
-                    })
-                instance.user_name = tweet['user_name']
-                instance.user_profile_image_url = tweet[
-                    'user_profile_image_url'
-                ]
-                instance.user_screen_name = tweet['user_screen_name']
-                instance.created_at = tweet['created_at']
-                instance.favorites = tweet['favorites']
-                instance.media = tweet['media']
-                instance.retweets = tweet['retweets']
-                instance.text = tweet['text']
-                session.add(instance)
-                session.commit()
-                session.refresh(handle)
+            instance = session.query(models.tweet).get(tweet['id'])
+            if not instance:
+                instance = models.tweet(**{
+                    'id': tweet['id'],
+                })
+            instance.created_at = tweet['created_at']
+            instance.favorites = tweet['favorites']
+            instance.media = tweet['media']
+            instance.retweets = tweet['retweets']
+            instance.text = tweet['text']
+            instance.user_name = tweet['user_name']
+            instance.user_profile_image_url = tweet['user_profile_image_url']
+            instance.user_screen_name = tweet['user_screen_name']
+            session.add(instance)
+            session.commit()
+            session.refresh(handle)
         log.write(10, len(tweets), 2)
 
 

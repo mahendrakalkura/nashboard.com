@@ -1,24 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from bleach import linkify
 from datetime import datetime, timedelta
+from difflib import SequenceMatcher
+from re import compile, match
+
+from bleach import linkify
 from flask import (
-    abort,
-    Blueprint,
-    flash,
-    g,
-    redirect,
-    render_template,
-    request,
-    url_for
+    abort, Blueprint, flash, g, redirect, render_template, request, url_for,
 )
 from pytz import utc
-from difflib import SequenceMatcher
 
 from modules import forms
 from modules import models
 from modules import utilities
-from re import compile, match
+
 blueprint = Blueprint('visitors', __name__)
 
 
@@ -38,7 +33,7 @@ def dashboard():
 
 
 @blueprint.route('/ajax', methods=['POST'])
-def ajax():
+def dashboard_ajax():
     category = g.mysql.query(models.category).get(request.form['category_id'])
     if not category:
         abort(404)
@@ -46,7 +41,7 @@ def ajax():
     query = g.mysql.query(
         models.handle,
     ).join(
-        models.category_handle
+        models.category_handle,
     ).filter(
         models.category_handle.category == category,
     )
@@ -69,7 +64,7 @@ def ajax():
     tweets = []
     texts = []
     for tweet in query.order_by(
-        'created_at asc, favorites desc, retweets desc'
+        'created_at asc, favorites desc, retweets desc',
     ):
         if (
             category.name == 'Happy Hours'
@@ -88,16 +83,11 @@ def ajax():
         if counts[tweet.user_screen_name] >= 5:
             continue
         if (
-            category.name == "Food & Beverage"
+            category.name == 'Food & Beverage'
             or
-            category.name == "Music"
+            category.name == 'Music'
         ):
-            text = compile(r'\W+')
-            text = text.split(tweet.text)
-            if match("[a-zA-Z0-9]", text[0]):
-                text = len(text)
-            else:
-                text = len(text)-1
+            text = len(filter(None, tweet.text.split(' ')))
             if text < 7:
                 continue
             if (
@@ -107,10 +97,9 @@ def ajax():
             ):
                 continue
             count = 0
-            if texts:
-                for text in texts:
-                    if(similar(text, tweet.text) > 0.67):
-                        count += 1
+            for text in texts:
+                if get_ratio(text, tweet.text) > 0.67:
+                    count += 1
             if count >= 1:
                 continue
             tweets.append({
@@ -118,15 +107,15 @@ def ajax():
                     tzinfo=utc
                 ).isoformat(' '),
                 'favorites': tweet.favorites,
-                'user_profile_image_url': tweet.user_profile_image_url,
-                'user_screen_name': tweet.user_screen_name,
-                'user_name': tweet.user_name,
                 'id': tweet.id,
                 'media': tweet.media,
                 'retweets': tweet.retweets,
                 'text': linkify(tweet.text, [
                     callback,
                 ], parse_email=False, skip_pre=False),
+                'user_name': tweet.user_name,
+                'user_profile_image_url': tweet.user_profile_image_url,
+                'user_screen_name': tweet.user_screen_name,
             })
             texts.append(tweet.text)
         else:
@@ -135,26 +124,40 @@ def ajax():
                     tzinfo=utc
                 ).isoformat(' '),
                 'favorites': tweet.favorites,
-                'user_profile_image_url': tweet.user_profile_image_url,
-                'user_screen_name': tweet.user_screen_name,
-                'user_name': tweet.user_name,
                 'id': tweet.id,
                 'media': tweet.media,
                 'retweets': tweet.retweets,
                 'text': linkify(tweet.text, [
                     callback,
                 ], parse_email=False, skip_pre=False),
+                'user_name': tweet.user_name,
+                'user_profile_image_url': tweet.user_profile_image_url,
+                'user_screen_name': tweet.user_screen_name,
             })
         counts[tweet.user_screen_name] += 1
-    return render_template('visitors/views/ajax.html', tweets=reversed(tweets))
+    return render_template(
+        'visitors/views/dashboard_ajax.html', tweets=reversed(tweets),
+    )
 
 
-@blueprint.route('/handles/<name>/ajax', methods=['POST'])
-def handles_ajax(name):
+@blueprint.route('/handles/<screen_name>')
+def handles(screen_name):
     handle = g.mysql.query(
-        models.handle
+        models.handle,
     ).filter(
-        models.handle.screen_name == name
+        models.handle.screen_name == screen_name,
+    ).first()
+    if not handle:
+        abort(404)
+    return render_template('visitors/views/handles.html', handle=handle)
+
+
+@blueprint.route('/handles/<screen_name>/ajax', methods=['POST'])
+def handles_ajax(screen_name):
+    handle = g.mysql.query(
+        models.handle,
+    ).filter(
+        models.handle.screen_name == screen_name,
     ).first()
     if not handle:
         abort(404)
@@ -173,21 +176,17 @@ def handles_ajax(name):
         tweets.append({
             'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
             'favorites': tweet.favorites,
-            'user_profile_image_url': tweet.user_profile_image_url,
-            'user_screen_name': tweet.user_screen_name,
-            'user_name': tweet.user_name,
             'id': tweet.id,
             'media': tweet.media,
             'retweets': tweet.retweets,
             'text': linkify(tweet.text, [
                 callback,
             ], parse_email=False, skip_pre=False),
+            'user_name': tweet.user_name,
+            'user_profile_image_url': tweet.user_profile_image_url,
+            'user_screen_name': tweet.user_screen_name,
         })
-    return render_template(
-        'visitors/views/handles_ajax.html',
-        handle=handle,
-        tweets=tweets
-    )
+    return render_template('visitors/views/handles_ajax.html', tweets=tweets)
 
 
 @blueprint.route('/stay-in-touch', methods=['GET', 'POST'])
@@ -207,7 +206,6 @@ def stay_in_touch():
             "We're still under development! Check back later for updates!",
             'warning'
         )
-
     return render_template('visitors/views/stay_in_touch.html', form=form)
 
 
@@ -221,23 +219,11 @@ def about():
     return render_template('visitors/views/about.html')
 
 
-@blueprint.route('/handles/<name>')
-def handles(name):
-    handle = g.mysql.query(
-        models.handle
-    ).filter(
-        models.handle.screen_name == name
-    ).first()
-    if not handle:
-        abort(404)
-    return render_template('visitors/views/handles.html', handle=handle)
-
-
 def callback(attrs, new=False):
     attrs['rel'] = 'nofollow'
     attrs['target'] = '_blank'
     return attrs
 
 
-def similar(a, b):
+def get_ratio(a, b):
     return SequenceMatcher(None, a, b).ratio()

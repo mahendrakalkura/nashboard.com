@@ -46,22 +46,17 @@ assets.register('javascripts', Bundle(
     'vendor/jquery-backstretch/jquery.backstretch.js',
     'vendor/jquery-timeago/jquery.timeago.js',
     'vendor/bootstrap/dist/js/bootstrap.js',
-    'vendor/lightbox2/js/lightbox.js',
-    'vendor/bootstrap3-wysiwyg/dist/bootstrap3-wysihtml5.js',
     'vendor/bootstrap3-wysiwyg/dist/bootstrap3-wysihtml5.all.js',
-    'vendor/bootstrap3-wysiwyg/dist/bootstrap3-wysihtml5.all.min.js',
-    'vendor/bootstrap3-wysiwyg/dist/bootstrap3-wysihtml5.min.js',
+    'vendor/lightbox2/js/lightbox.js',
     'javascripts/all.js',
     filters='rjsmin' if not application.config['DEBUG'] else None,
     output='assets/compressed.js',
 ))
 assets.register('stylesheets', Bundle(
-    'vendor/lightbox2/css/lightbox.css',
     'vendor/bootstrap3-wysiwyg/dist/bootstrap3-wysihtml5.css',
+    'vendor/lightbox2/css/lightbox.css',
     Bundle(
-        'stylesheets/all.less',
-        filters='less',
-        output='stylesheets/all.css',
+        'stylesheets/all.less', filters='less', output='stylesheets/all.css',
     ),
     filters='cssmin,cssrewrite'if not application.config['DEBUG'] else None,
     output='assets/compressed.css',
@@ -108,7 +103,6 @@ def favicon():
 @application.template_filter('format_integer')
 def format_integer(value):
     return utilities.get_integer(value)
-
 
 if __name__ == '__main__':
     application.run()

@@ -30,23 +30,6 @@ class category(database.base):
                 return value
         return ''
 
-    def get_tweets(self):
-        screen_names = []
-        for instance in g.mysql.query(
-            handle,
-        ).join(
-            category_handle,
-        ).filter(
-            category_handle.category == self,
-        ).all():
-            screen_names.append(instance.screen_name)
-
-        return g.mysql.query(
-            tweet,
-        ).filter(
-            tweet.user_screen_name.in_(screen_names)
-        ).count()
-
     def get_position(self):
         return g.mysql.query('position').from_statement(
             '''
@@ -54,6 +37,22 @@ class category(database.base):
             FROM categories
             '''
         ).one()[0]
+
+    def get_tweets(self):
+        return g.mysql.query(
+            tweet,
+        ).filter(
+            tweet.user_screen_name.in_([
+                instance.screen_name
+                for instance in g.mysql.query(
+                    handle,
+                ).join(
+                    category_handle,
+                ).filter(
+                    category_handle.category == self,
+                ).all()
+            ]),
+        ).count()
 
     def set_position(self, direction):
         if direction == 'up':
@@ -139,11 +138,20 @@ class handle(database.base):
         ),
     )
 
-    def get_tweets(self):
+    def get_tweets_1(self):
         return g.mysql.query(
-            tweet
+            tweet,
         ).filter(
-            tweet.user_screen_name == self.screen_name
+            tweet.user_screen_name == self.screen_name,
+        ).count()
+
+    def get_tweets_2(self):
+        return g.mysql.query(
+            tweet,
+        ).filter(
+            tweet.text.like('%%@%(screen_name)s%%' % {
+                'screen_name': self.screen_name,
+            }),
         ).count()
 
 

@@ -4,6 +4,3 @@ resources/assets/versions.json
 resources/stylesheets/all.css
 resources/vendor
 settings.py
-*.pyc
-venv
-.DS_Store

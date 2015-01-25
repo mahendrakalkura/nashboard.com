@@ -60,13 +60,6 @@ class handles_form(Form):
             validators.required(),
         ],
     )
-    name = TextField(
-        label='Name',
-        validators=[
-            validators.required(),
-            validators.unique(table='handles', columns=[]),
-        ],
-    )
     screen_name = TextField(
         label='Screen Name',
         validators=[
@@ -74,17 +67,24 @@ class handles_form(Form):
             validators.unique(table='handles', columns=[]),
         ],
     )
-    summary = TextAreaField(
-        default='A brief summary of the handle.....',
-        validators=[validators.required()],
-        widget=widgets.textarea(rows=10),
-    )
-    profile_image_url = TextField(
-        label='Image URL',
+    name = TextField(
+        label='Name',
         validators=[
             validators.required(),
             validators.unique(table='handles', columns=[]),
         ],
+    )
+    profile_image_url = TextField(
+        label='Profile Image URL',
+        validators=[
+            validators.required(),
+            validators.unique(table='handles', columns=[]),
+        ],
+    )
+    summary = TextAreaField(
+        description=['Enter a brief summary of the handle...'],
+        validators=[validators.required()],
+        widget=widgets.textarea(rows=10),
     )
     categories = QuerySelectMultipleField(
         allow_blank=False,
@@ -98,15 +98,16 @@ class handles_form(Form):
 
     def get_instance(self, handle):
         handle.neighborhood = self.neighborhood.data
-        handle.name = self.name.data
         handle.screen_name = self.screen_name.data
-        handle.categories = self.categories.data
+        handle.name = self.name.data
         handle.profile_image_url = self.profile_image_url.data
         handle.summary = self.summary.data
+        handle.categories = self.categories.data
         return handle
 
 
 class handles_filters(Form):
+    screen_name = TextField(label='Screen Name')
     name = TextField(label='Name')
     category = SelectField(choices=[], default='')
 
@@ -118,6 +119,12 @@ class handles_filters(Form):
         ]
 
     def apply(self, query):
+        if self.screen_name.data:
+            query = query.filter(
+                models.handle.screen_name.like('%%%(screen_name)s%%' % {
+                    'screen_name': self.screen_name.data,
+                })
+            )
         if self.name.data:
             query = query.filter(
                 models.handle.name.like('%%%(name)s%%' % {

@@ -1,19 +1,19 @@
 {
-  "dependencies": {
-    "bootstrap": "3.2.0",
-    "font-awesome": "4.1",
-    "jquery": "2.1.1",
-    "jquery-backstretch": "2.0.4",
-    "jquery-timeago": "1.4.1",
-    "lightbox2": "2.7.1",
-    "bootstrap3-wysiwyg" : "*"
-  },
-  "devDependencies": {},
-  "ignore": [],
-  "main": "",
-  "name": "nashboard.com",
-  "version": "1.0.0",
-  "resolutions": {
-    "jquery": "2.1.1"
-  }
+    "dependencies": {
+        "bootstrap": "3.2.0",
+        "bootstrap3-wysiwyg" : "0.3.3",
+        "font-awesome": "4.1",
+        "jquery": "2.1.1",
+        "jquery-backstretch": "2.0.4",
+        "jquery-timeago": "1.4.1",
+        "lightbox2": "2.7.1"
+    },
+    "devDependencies": {},
+    "ignore": [],
+    "main": "",
+    "name": "nashboard.com",
+    "version": "1.0.0",
+    "resolutions": {
+        "jquery": "2.1.1"
+    }
 }

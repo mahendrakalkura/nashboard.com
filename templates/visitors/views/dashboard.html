@@ -3,9 +3,10 @@
 {% set title = 'Nashboard' %}
 
 {% block component %}
-    <div class="row"
+    <div
+        class="row"
+        data-url="{{ url_for('visitors.dashboard_ajax') }}"
         id="dashboard"
-        data-url="{{ url_for('visitors.ajax') }}"
         >
         <div id="tweets"></div>
         <div class="alert alert-danger" id="failure_1">

@@ -41,6 +41,8 @@ $ mysql nashboard.com < files/1.sql
 $ mysql nashboard.com < files/2.sql
 $ mysql nashboard.com < files/3.sql
 $ mysql nashboard.com < files/4.sql
+$ mysql nashboard.com < files/5.sql
+$ mysql nashboard.com < files/6.sql
 ```
 
 Assets

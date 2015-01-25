@@ -122,9 +122,9 @@ def get_tweets(q):
         if not 'items_html' in contents:
             break
         for tweet in Selector(
-            text=contents['items_html']
+            text=contents['items_html'],
         ).xpath(
-            '//div[@data-tweet-id]'
+            '//div[@data-tweet-id]',
         ):
             tweet = get_tweet(tweet)
             if tweet:
@@ -140,52 +140,16 @@ def get_tweets(q):
 
 def get_tweet(tweet):
     id = ''
-    created_at = ''
-    favorites = ''
-    media = ''
-    text = ''
-    retweets = ''
     user_name = ''
     user_profile_image_url = ''
     user_screen_name = ''
+    created_at = ''
+    favorites = 0
+    media = ''
+    retweets = 0
+    text = ''
     try:
         id = tweet.xpath('.//@data-tweet-id').extract()[0]
-    except IndexError:
-        pass
-    try:
-        created_at = datetime.fromtimestamp(int(tweet.xpath(
-            './/div[@class="content"]/div[@class="stream-item-header"]/'
-            'small[@class="time"]/a/span/@data-time'
-        ).extract()[0]))
-    except IndexError:
-        pass
-    try:
-        favorites = tweet.xpath(
-            './/span[@class="ProfileTweet-action--favorite u-hiddenVisually"]/'
-            'span[@class="ProfileTweet-actionCount"]/@data-tweet-stat-count'
-        ).extract()[0].strip()
-    except IndexError:
-        pass
-    try:
-        media = tweet.xpath(
-            './/a[@data-resolved-url-large]/@data-resolved-url-large'
-        ).extract()[0]
-    except IndexError:
-        pass
-    try:
-        text = tweet.xpath(
-            './/div[@class="content"]/p[@class="js-tweet-text tweet-text"]'
-        ).xpath(
-            'string()'
-        ).extract()[0].strip()
-    except IndexError:
-        pass
-    try:
-        retweets = tweet.xpath(
-            './/span[@class="ProfileTweet-action--retweet u-hiddenVisually"]'
-            '/span[@class="ProfileTweet-actionCount"]/'
-            '@data-tweet-stat-count'
-        ).extract()[0].strip()
     except IndexError:
         pass
     try:
@@ -202,6 +166,42 @@ def get_tweet(tweet):
     try:
         user_screen_name = tweet.xpath('.//@data-screen-name').extract()[0]
     except ValueError:
+        pass
+    try:
+        created_at = datetime.fromtimestamp(int(tweet.xpath(
+            './/div[@class="content"]/div[@class="stream-item-header"]/'
+            'small[@class="time"]/a/span/@data-time'
+        ).extract()[0]))
+    except IndexError:
+        pass
+    try:
+        favorites = int(tweet.xpath(
+            './/span[@class="ProfileTweet-action--favorite u-hiddenVisually"]/'
+            'span[@class="ProfileTweet-actionCount"]/@data-tweet-stat-count'
+        ).extract()[0].strip())
+    except IndexError:
+        pass
+    try:
+        media = tweet.xpath(
+            './/a[@data-resolved-url-large]/@data-resolved-url-large'
+        ).extract()[0]
+    except IndexError:
+        pass
+    try:
+        retweets = int(tweet.xpath(
+            './/span[@class="ProfileTweet-action--retweet u-hiddenVisually"]'
+            '/span[@class="ProfileTweet-actionCount"]/'
+            '@data-tweet-stat-count'
+        ).extract()[0].strip())
+    except IndexError:
+        pass
+    try:
+        text = tweet.xpath(
+            './/div[@class="content"]/p[@class="js-tweet-text tweet-text"]'
+        ).xpath(
+            'string()'
+        ).extract()[0].strip()
+    except IndexError:
         pass
     if not media:
         for url in findall(
