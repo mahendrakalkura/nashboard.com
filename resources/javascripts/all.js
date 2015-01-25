@@ -173,5 +173,8 @@ jQuery(function () {
         'image': true,
         'link': true,
         'lists': true,
+        'toolbar': {
+            'fa': true
+        }
     });
 });
