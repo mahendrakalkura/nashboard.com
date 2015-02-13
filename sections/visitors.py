@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from bleach import linkify
 from datetime import datetime, timedelta
+from difflib import SequenceMatcher
+
+from authomatic.extras.flask import FlaskAuthomatic
+from authomatic.providers import oauth1
+from bleach import linkify
 from flask import (
-    abort,
     Blueprint,
+    abort,
     flash,
     g,
     redirect,
     render_template,
     request,
-    url_for,
-    session
+    session,
+    url_for
 )
 from pytz import utc
-from difflib import SequenceMatcher
-from authomatic.extras.flask import FlaskAuthomatic
-from authomatic.providers import oauth1
 
 from modules import forms
 from modules import models
@@ -54,11 +55,6 @@ def before_request():
         ).get(session['visitor'])
 
 
-@blueprint.after_request
-def after_request(response):
-    return response
-
-
 @blueprint.route('/')
 def dashboard():
     return render_template('visitors/views/dashboard.html')
@@ -66,7 +62,6 @@ def dashboard():
 
 @blueprint.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
-
     form = forms.sign_up(request.form)
     social_user = models.social_user()
     form.id = social_user.id
