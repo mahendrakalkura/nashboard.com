@@ -65,9 +65,28 @@
                                     >{{ neighborhood.name }}</option>
                             {% endfor %}
                         </select>
-                        <div class="clear hidden"></div>
-                        <a class="fa fa-sign-in btn" href="{{ url_for('visitors.stay_in_touch')}}?f=1"> sign in</a>
-                        <a class="fa fa-arrow-circle-up btn" href="{{ url_for('visitors.stay_in_touch')}}?f=1"> sign up</a>
+                    <div class="clear hidden"></div>
+                        {% if g.visitor %}
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    {{ g.visitor.username }}
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="{{ url_for(
+                                            'visitors.sign_out'
+                                        ) }}">
+                                            <i class="fa fa-fw fa-home"></i>
+                                            Sign out
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        {%else %}
+                            <a class="fa fa-arrow-circle-up btn" href="{{ url_for('visitors.sign_up')}}?f=1"> sign up</a>
+                            <a class="fa fa-sign-in btn" href="{{ url_for('visitors.sign_in')}}?f=1"> sign in</a>
+                        {% endif %}
                     </div>
                     <div class="bottom collapse navbar-collapse" id="actual-navbar">
                         <ul class="nav navbar-nav">

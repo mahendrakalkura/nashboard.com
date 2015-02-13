@@ -176,6 +176,61 @@ class profile(Form):
         g.mysql.commit()
 
 
+class sign_up(Form):
+    username = TextField(
+        validators=[
+            validators.required(),
+            validators.unique(table='social_users', columns=[])
+        ]
+    )
+    password = PasswordField(validators=[validators.required()])
+    confirm = PasswordField(
+        label='Confirm Password',
+        validators=[validators.required()]
+    )
+
+    def validate(self):
+        if super(sign_up, self).validate():
+            if self.password.data == self.confirm.data:
+                return True
+            self.password.errors = [
+                'password and confirm password are different'
+            ]
+            return False
+
+    def get_instance(self, social_user):
+        password = hashpw(self.password.data.encode('utf-8'), gensalt(10))
+        social_user.username = self.username.data
+        social_user.password = password
+        return social_user
+
+
+class visitor_sign_in(Form):
+    username = TextField(validators=[validators.required()])
+    password = PasswordField(validators=[validators.required()])
+
+    def validate(self):
+        if super(visitor_sign_in, self).validate():
+            instance = g.mysql.query(
+                models.social_user
+            ).filter(
+                models.social_user.username == self.username.data,
+            ).first()
+            if (
+                instance
+                and
+                hashpw(
+                    self.password.data.encode('utf-8'),
+                    instance.password.encode('utf-8'),
+                ) == instance.password
+            ):
+                session['visitor'] = instance.id
+                return True
+        self.username.errors = ['Invalid Username/Password']
+        self.password.errors = []
+        return False
+
+
 class sign_in(Form):
     username = TextField(validators=[validators.required()])
     password = PasswordField(validators=[validators.required()])

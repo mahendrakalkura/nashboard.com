@@ -1,19 +1,42 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timedelta
-from difflib import SequenceMatcher
-
 from bleach import linkify
+from datetime import datetime, timedelta
 from flask import (
-    abort, Blueprint, flash, g, redirect, render_template, request, url_for,
+    abort,
+    Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    url_for,
+    session
 )
 from pytz import utc
+from difflib import SequenceMatcher
+from authomatic.extras.flask import FlaskAuthomatic
+from authomatic.providers import oauth1
 
 from modules import forms
 from modules import models
 from modules import utilities
 
+import settings
+
 blueprint = Blueprint('visitors', __name__)
+
+twitter = FlaskAuthomatic(
+    config={
+        'twitter': {
+            'class_': oauth1.Twitter,
+            'consumer_key': settings.CONSUMER_KEY,
+            'consumer_secret': settings.CONSUMER_SECRET,
+        },
+    },
+    secret=settings.SECRET_KEY,
+    debug=True,
+)
 
 
 @blueprint.before_request
@@ -24,11 +47,144 @@ def before_request():
     g.neighborhoods = g.mysql.query(
         models.neighborhood,
     ).order_by('position asc').all()
+    g.visitor = None
+    if 'visitor' in session:
+        g.visitor = g.mysql.query(
+            models.social_user
+        ).get(session['visitor'])
+
+
+@blueprint.after_request
+def after_request(response):
+    return response
 
 
 @blueprint.route('/')
 def dashboard():
     return render_template('visitors/views/dashboard.html')
+
+
+@blueprint.route('/sign-up', methods=['GET', 'POST'])
+def sign_up():
+
+    form = forms.sign_up(request.form)
+    social_user = models.social_user()
+    form.id = social_user.id
+
+    if g.visitor:
+        return redirect(
+            request.args.get('next') or url_for('visitors.dashboard')
+        )
+
+    if form.validate_on_submit():
+        g.mysql.add(form.get_instance(social_user))
+        g.mysql.commit()
+        flash(
+            'You have successfully Registerd. Please sign in to proceed',
+            'success'
+        )
+        return redirect(url_for('visitors.sign_in'))
+
+    return render_template('visitors/views/sign_up.html', form=form)
+
+
+@blueprint.route('/sign-up/<provider_id>', methods=['GET', 'POST'])
+@twitter.login('twitter')
+def social_sign_up(provider_id=None):
+    if twitter.result:
+        if twitter.result.error:
+            flash(twitter.result.error.message, 'danger')
+            return redirect(url_for('visitors.sign_up'))
+        elif twitter.result.user:
+            if not (twitter.result.user.name and twitter.result.user.id):
+                twitter.result.user.update()
+            if g.mysql.query(
+                models.social_user
+            ).filter(
+                models.social_user.username == twitter.result.user.name,
+            ).first():
+                flash(
+                    'You have already Registered.'
+                    'Please sign-in to continue',
+                    'danger'
+                )
+                return redirect(url_for('visitors.sign_in'))
+            else:
+                g.mysql.add(models.social_user(**{
+                    'username': twitter.result.user.name,
+                }))
+                g.mysql.commit()
+                flash(
+                    'You have successfully Registered.'
+                    'Please sign-in to continue',
+                    'success'
+                )
+                return redirect(url_for('visitors.sign_in'))
+            return redirect(url_for('visitors.sign_in'))
+    else:
+        return twitter.response
+
+
+@blueprint.route('/sign-in', methods=['GET', 'POST'])
+def sign_in():
+    form = forms.visitor_sign_in(request.form)
+
+    if g.visitor:
+        return redirect(
+            request.args.get('next') or url_for('visitors.dashboard')
+        )
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            g.username = form.username.data
+            flash('You have been signed in successfully.', 'success')
+            return redirect(
+                request.args.get('next') or url_for('visitors.dashboard')
+            )
+        flash('You have not been signed in successfully.', 'danger')
+    return render_template('visitors/views/sign_in.html', form=form)
+
+
+@blueprint.route('/sign-in/<provider_id>', methods=['GET', 'POST'])
+@twitter.login('twitter')
+def social_sign_in(provider_id=None):
+    if twitter.result:
+        if twitter.result.error:
+            flash(twitter.result.error.message, 'danger')
+            return redirect(url_for('visitors.sign_up'))
+        elif twitter.result.user:
+            if not (twitter.result.user.name and twitter.result.user.id):
+                twitter.result.user.update()
+            instance = g.mysql.query(
+                models.social_user
+            ).filter(
+                models.social_user.username == twitter.result.user.name,
+            ).first()
+            if instance:
+                session['visitor'] = instance.id
+                flash(
+                    'You have Successfully sign-in',
+                    'success'
+                )
+                return redirect(url_for('visitors.dashboard'))
+            else:
+                flash(
+                    'You have Not Registered.'
+                    'Please Register first',
+                    'danger'
+                )
+                return redirect(url_for('visitors.sign_up'))
+            return redirect(url_for('visitors.sign_in'))
+    else:
+        return twitter.response
+
+
+@blueprint.route('/sign-out')
+def sign_out():
+    if 'visitor' in session:
+        del session['visitor']
+    flash('You have been signed out successfully.', 'success')
+    return redirect(url_for('visitors.sign_in'))
 
 
 @blueprint.route('/ajax', methods=['POST'])

@@ -29,3 +29,8 @@ SQLALCHEMY = (
     'password': '',
     'username': '',
 }
+
+# TWITTER
+
+CONSUMER_KEY = ''
+CONSUMER_SECRET = ''
