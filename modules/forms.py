@@ -177,10 +177,11 @@ class profile(Form):
 
 
 class sign_up(Form):
-    username = TextField(
+    email = TextField(
         validators=[
             validators.required(),
-            validators.unique(table='social_users', columns=[])
+            validators.email(),
+            validators.unique(table='users', columns=[])
         ]
     )
     password = PasswordField(validators=[validators.required()])
@@ -198,23 +199,23 @@ class sign_up(Form):
             ]
             return False
 
-    def get_instance(self, social_user):
+    def get_instance(self, user):
         password = hashpw(self.password.data.encode('utf-8'), gensalt(10))
-        social_user.username = self.username.data
-        social_user.password = password
-        return social_user
+        user.email = self.email.data
+        user.password = password
+        return user
 
 
 class visitor_sign_in(Form):
-    username = TextField(validators=[validators.required()])
+    email = TextField(validators=[validators.required(), validators.email()])
     password = PasswordField(validators=[validators.required()])
 
     def validate(self):
         if super(visitor_sign_in, self).validate():
             instance = g.mysql.query(
-                models.social_user
+                models.user
             ).filter(
-                models.social_user.username == self.username.data,
+                models.user.email == self.email.data,
             ).first()
             if (
                 instance
@@ -226,7 +227,7 @@ class visitor_sign_in(Form):
             ):
                 session['visitor'] = instance.id
                 return True
-        self.username.errors = ['Invalid Username/Password']
+        self.email.errors = ['Invalid Username/Password']
         self.password.errors = []
         return False
 

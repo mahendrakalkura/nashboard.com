@@ -21,6 +21,35 @@
                 <p class="created_at" title="{{ tweet.created_at }}">
                     {{ tweet.created_at }}
                 </p>
+                <div id="vote-part">
+                    {% if g.visitor %}
+                        Number of Vote: {{ tweet.total_vote }}
+                        {% if tweet.vote != 'up' and tweet.vote != 'down' %}
+                            <div class="buttons">
+                                <div
+                                    class="up-vote"
+                                    data-direction="up"
+                                    data-tweet-id="{{ tweet.id }}"
+                                    data-url="{{ url_for('visitors.votes') }}"
+                                    >
+                                    <a class="btn btn-sm">
+                                        <i class="fa fa-arrow-up"></i>
+                                    </a>
+                                </div>
+                                <div
+                                    class="down-vote"
+                                    data-direction="down"
+                                    data-tweet-id="{{ tweet.id }}"
+                                    data-url="{{ url_for('visitors.votes') }}"
+                                    >
+                                    <a class="btn btn-sm">
+                                        <i class="fa fa-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
             </div>
             <div class="col-sm-7 part body">
                 <p class="text">{{ tweet.text|safe }}</p>

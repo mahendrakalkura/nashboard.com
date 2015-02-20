@@ -69,7 +69,11 @@
                         {% if g.visitor %}
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                    {{ g.visitor.username }}
+                                    {% if g.visitor.email %}
+                                        {{ g.visitor.email }}
+                                    {% else %}
+                                        {{ g.visitor.twitter_screen_name }}
+                                    {% endif %}
                                     <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
@@ -105,6 +109,28 @@
                 </div>
             </nav>
         </header>
+        {% if g.visitor %}
+            <div class="buttons">
+                <div class="btn btn btn-default pull-right">
+                    <div
+                        class="whathot"
+                        data-type="whathot"
+                        data-url="{{ url_for('visitors.dashboard_ajax') }}"
+                        >
+                        What's Hot
+                    </div>
+                </div>
+                <div class="btn btn btn-default pull-right">
+                    <div
+                        class="realtime"
+                        data-type="realtime"
+                        data-url="{{ url_for('visitors.dashboard_ajax') }}"
+                        >
+                        Real Time
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div class="container">
             <div class="row">
                 <div class="col-md-9 col-md-offset-3">

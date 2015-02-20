@@ -183,8 +183,15 @@ class tweet(database.base):
     }
 
 
-class social_user(database.base):
-    __tablename__ = 'social_users'
+class user(database.base):
+    __tablename__ = 'users'
+    __table_args__ = {
+        'autoload': True,
+    }
+
+
+class vote(database.base):
+    __tablename__ = 'votes'
     __table_args__ = {
         'autoload': True,
     }

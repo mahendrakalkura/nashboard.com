@@ -51,7 +51,7 @@ def before_request():
     g.visitor = None
     if 'visitor' in session:
         g.visitor = g.mysql.query(
-            models.social_user
+            models.user
         ).get(session['visitor'])
 
 
@@ -63,8 +63,8 @@ def dashboard():
 @blueprint.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
     form = forms.sign_up(request.form)
-    social_user = models.social_user()
-    form.id = social_user.id
+    user = models.user()
+    form.id = user.id
 
     if g.visitor:
         return redirect(
@@ -72,7 +72,7 @@ def sign_up():
         )
 
     if form.validate_on_submit():
-        g.mysql.add(form.get_instance(social_user))
+        g.mysql.add(form.get_instance(user))
         g.mysql.commit()
         flash(
             'You have successfully Registerd. Please sign in to proceed',
@@ -94,9 +94,9 @@ def social_sign_up(provider_id=None):
             if not (twitter.result.user.name and twitter.result.user.id):
                 twitter.result.user.update()
             if g.mysql.query(
-                models.social_user
+                models.user
             ).filter(
-                models.social_user.username == twitter.result.user.name,
+                models.user.twitter_screen_name == twitter.result.user.name,
             ).first():
                 flash(
                     'You have already Registered.'
@@ -105,8 +105,8 @@ def social_sign_up(provider_id=None):
                 )
                 return redirect(url_for('visitors.sign_in'))
             else:
-                g.mysql.add(models.social_user(**{
-                    'username': twitter.result.user.name,
+                g.mysql.add(models.user(**{
+                    'twitter_screen_name': twitter.result.user.name,
                 }))
                 g.mysql.commit()
                 flash(
@@ -123,7 +123,6 @@ def social_sign_up(provider_id=None):
 @blueprint.route('/sign-in', methods=['GET', 'POST'])
 def sign_in():
     form = forms.visitor_sign_in(request.form)
-
     if g.visitor:
         return redirect(
             request.args.get('next') or url_for('visitors.dashboard')
@@ -131,7 +130,6 @@ def sign_in():
 
     if request.method == 'POST':
         if form.validate_on_submit():
-            g.username = form.username.data
             flash('You have been signed in successfully.', 'success')
             return redirect(
                 request.args.get('next') or url_for('visitors.dashboard')
@@ -151,9 +149,9 @@ def social_sign_in(provider_id=None):
             if not (twitter.result.user.name and twitter.result.user.id):
                 twitter.result.user.update()
             instance = g.mysql.query(
-                models.social_user
+                models.user
             ).filter(
-                models.social_user.username == twitter.result.user.name,
+                models.user.twitter_screen_name == twitter.result.user.name,
             ).first()
             if instance:
                 session['visitor'] = instance.id
@@ -180,6 +178,25 @@ def sign_out():
         del session['visitor']
     flash('You have been signed out successfully.', 'success')
     return redirect(url_for('visitors.sign_in'))
+
+
+@blueprint.route('/votes', methods=['POST'])
+def votes():
+    vote = g.mysql.query(
+        models.vote,
+    ).filter(
+        models.vote.user_id == g.visitor.id,
+        models.vote.tweet_id == request.form['tweet_id']
+    ).first()
+    if not vote:
+        g.mysql.add(models.vote(**{
+            'direction': request.form['direction'],
+            'timestamp': datetime.now(),
+            'tweet_id': request.form['tweet_id'],
+            'user_id': g.visitor.id,
+        }))
+        g.mysql.commit()
+    return render_template('visitors/views/dashboard_ajax.html')
 
 
 @blueprint.route('/ajax', methods=['POST'])
@@ -216,6 +233,38 @@ def dashboard_ajax():
     for tweet in query.order_by(
         'created_at asc, favorites desc, retweets desc',
     ):
+        total_vote = 0
+        vote = None
+        if g.visitor:
+            vote = g.mysql.query(
+                models.vote,
+            ).filter(
+                models.vote.user_id == g.visitor.id,
+                models.vote.tweet_id == tweet.id
+            ).first()
+            if vote:
+                vote = vote.direction
+            number_up_vote = g.mysql.query(
+                models.vote,
+            ).filter(
+                models.vote.tweet_id == tweet.id,
+                models.vote.direction == 'up'
+            ).count()
+            number_down_vote = g.mysql.query(
+                models.vote,
+            ).filter(
+                models.vote.tweet_id == tweet.id,
+                models.vote.direction == 'down'
+            ).count()
+            total_vote = (
+                tweet.retweets
+                +
+                tweet.favorites
+                +
+                number_up_vote
+                -
+                number_down_vote
+            )
         if (
             category.name == 'Happy Hours'
             and
@@ -266,6 +315,8 @@ def dashboard_ajax():
                 'user_name': tweet.user_name,
                 'user_profile_image_url': tweet.user_profile_image_url,
                 'user_screen_name': tweet.user_screen_name,
+                'vote': vote,
+                'total_vote': total_vote,
             })
             texts.append(tweet.text)
         else:
@@ -283,8 +334,12 @@ def dashboard_ajax():
                 'user_name': tweet.user_name,
                 'user_profile_image_url': tweet.user_profile_image_url,
                 'user_screen_name': tweet.user_screen_name,
+                'vote': vote,
+                'total_vote': total_vote,
             })
         counts[tweet.user_screen_name] += 1
+    if request.form['data_type'] == 'whathot':
+        tweets = sorted(tweets, key=lambda k: k['total_vote'], reverse=False)
     return render_template(
         'visitors/views/dashboard_ajax.html', tweets=reversed(tweets),
     )

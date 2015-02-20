@@ -19,6 +19,7 @@ jQuery(function () {
             cache: false,
             data: {
                 category_id: category_id,
+                data_type: 'realtime',
                 neighborhood_id: neighborhood_id.val()
             },
             timeout: 30000,
@@ -31,6 +32,7 @@ jQuery(function () {
                 jQuery(
                     jQuery(data).find('.tweet').get().reverse()
                 ).each(function () {
+                    dashboard_vote();
                     var $this = jQuery(this);
                     if (tweets.find(
                         '.tweet[data-id="' + $this.attr('data-id') + '"]'
@@ -53,6 +55,56 @@ jQuery(function () {
             }
         );
     };
+
+    var dashboard_vote = function () {
+        jQuery('body').on('click', '.up-vote , .down-vote', function () {
+            var $this = jQuery(this);
+            jQuery.ajax({
+                cache: false,
+                data: {
+                      direction: $this.attr('data-direction'),
+                      tweet_id: $this.attr('data-tweet-id')
+                },
+                type: 'POST',
+                url: $this.attr('data-url')
+            }).then(
+                function () {
+                    $this.parent().hide();
+                }
+            );
+        });
+    };
+
+    jQuery('body').on('click', '.realtime , .whathot', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var $this = jQuery(this);
+        jQuery.ajax({
+            cache: false,
+            data: {
+                category_id: window.location.hash.substr(1),
+                data_type: $this.attr('data-type'),
+                neighborhood_id: jQuery('.top [name="neighborhood_id"]').val()
+            },
+            type: 'POST',
+            url: $this.attr('data-url')
+        }).then(
+            function (data, textStatus, jqXHR) {
+                var dashboard = jQuery('#dashboard');
+                var tweets = dashboard.find('#tweets')
+                tweets.find('.tweet').remove();
+                jQuery(
+                    jQuery(data).find('.tweet').get().reverse()
+                ).each(function () {
+                    var $this = jQuery(this);
+                    $this.find('.created_at').timeago();
+                    tweets.prepend($this);
+                });
+            },
+            function (jqXHR, textStatus, errorThrown) {
+            }
+        )
+    });
 
     var dashboard_refresh = function (category_id) {
         timeout = window.setTimeout(function () {
