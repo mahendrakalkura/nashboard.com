@@ -170,7 +170,7 @@ class users_sign_in(Form):
                 and
                 hashpw(self.password.data.encode('utf-8'), instance.password.encode('utf-8')) == instance.password
             ):
-                session['visitor'] = instance.id
+                session['user'] = instance.id
                 return True
         self.email.errors = ['Invalid Username/Password']
         self.password.errors = []

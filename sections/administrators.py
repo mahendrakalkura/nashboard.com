@@ -70,7 +70,7 @@ def dashboard():
 def categories_overview():
     return render_template(
         'administrators/views/categories_overview.html',
-        categories=g.mysql.query(models.category).order_by('position asc').all(),
+        categories=g.mysql.query(models.category).order_by('position ASC').all(),
     )
 
 
@@ -155,7 +155,7 @@ def categories_process():
 def neighborhoods_overview():
     return render_template(
         'administrators/views/neighborhoods_overview.html',
-        neighborhoods=g.mysql.query(models.neighborhood).order_by('position asc').all(),
+        neighborhoods=g.mysql.query(models.neighborhood).order_by('position ASC').all(),
     )
 
 
@@ -399,7 +399,7 @@ def visitors_export():
             **filters_
         ).apply(
             g.mysql.query(models.visitor)
-        ).order_by('timestamp desc').all()
+        ).order_by('timestamp DESC').all()
     ])
     return Response(
         csv.getvalue(),

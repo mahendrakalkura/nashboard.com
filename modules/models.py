@@ -60,7 +60,7 @@ class category(database.base):
                 category,
             ).filter(
                 category.position < self.position,
-            ).order_by('position desc').first()
+            ).order_by('position DESC').first()
             if instance:
                 swap(self, instance)
         if direction == 'down':
@@ -68,7 +68,7 @@ class category(database.base):
                 category,
             ).filter(
                 category.position > self.position,
-            ).order_by('position asc').first()
+            ).order_by('position ASC').first()
             if instance:
                 swap(self, instance)
 
@@ -102,7 +102,7 @@ class neighborhood(database.base):
                 neighborhood,
             ).filter(
                 neighborhood.position < self.position,
-            ).order_by('position desc').first()
+            ).order_by('position DESC').first()
             if instance:
                 swap(self, instance)
         if direction == 'down':
@@ -110,7 +110,7 @@ class neighborhood(database.base):
                 neighborhood,
             ).filter(
                 neighborhood.position > self.position,
-            ).order_by('position asc').first()
+            ).order_by('position ASC').first()
             if instance:
                 swap(self, instance)
 
@@ -198,8 +198,8 @@ def swap(one, two):
 
 
 def get_categories():
-    return g.mysql.query(category).order_by('position asc').all()
+    return g.mysql.query(category).order_by('position ASC').all()
 
 
 def get_neighborhoods():
-    return g.mysql.query(neighborhood).order_by('position asc').all()
+    return g.mysql.query(neighborhood).order_by('position ASC').all()

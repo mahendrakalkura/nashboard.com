@@ -74,7 +74,7 @@ supervisor
 [program:nashboard.com_twitter]
 autorestart=true
 autostart=true
-command={{ virtualenv }}/celery worker --app=manager --concurrency=50 --loglevel=WARNING --pool=prefork
+command={{ virtualenv }}/celery worker --app=manager --concurrency=50 --loglevel=WARNING --pool=processes
 directory={{ path }}
 group={{ group }}
 redirect_stderr=true

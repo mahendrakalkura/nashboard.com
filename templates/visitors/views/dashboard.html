@@ -5,15 +5,75 @@
 {% block component %}
     <div
         class="row"
-        data-url="{{ url_for('visitors.dashboard_ajax') }}"
-        id="dashboard"
+        data-url-refresh="{{ url_for('visitors.dashboard_ajax', category_id=category_id) }}"
+        data-url-vote="{{ url_for('visitors.dashboard_vote') }}"
+        ng-controller="dashboard"
         >
-        <div id="tweets"></div>
-        <div class="alert alert-danger" id="failure_1">
+        {% if g.user %}
+            <div class="clearfix">
+                <p class="btn-group pull-right">
+                    <label
+                        class="btn btn-default"
+                        ng-class="{active: mode == 'real_time'}"
+                        ng-click="mode = 'real_time'"
+                        >
+                        Real Time
+                    </label>
+                    <label
+                        class="btn btn-default"
+                        ng-class="{active: mode == 'whats_hot'}"
+                        ng-click="mode = 'whats_hot'"
+                        >
+                        What's Hot
+                    </label>
+                </p>
+            </div>
+            <hr>
+        {% endif %}
+        <div id="tweets">
+            <div ng-repeat="tweet in tweets" tweet="tweet">
+                <div
+                    class="tweet row"
+                    data-id="[! tweet.id !]"
+                    title="Favorites: [! tweet.favorites !]; Retweets: [! tweet.retweets !]; Score: [! tweet.score !]"
+                    >
+                    <div class="col-sm-3 part info">
+                        <a class="user_profile_image_url" href="[! tweet.url !]" target="_blank">
+                            <img src="[! tweet.user_profile_image_url !]">
+                        </a>
+                        <a class="user_screen_name" href="[! tweet.url !]" target="_blank">[! tweet.user_name !]</a>
+                        <p class="created_at" title="[! tweet.created_at !]">[! tweet.created_at !]</p>
+                        <div ng-show="!tweet.vote">
+                            <div class="vote">
+                                <div ng-click="vote(tweet, 'up')">
+                                    <a class="btn btn-sm">
+                                        <i class="fa fa-arrow-up"></i>
+                                    </a>
+                                </div>
+                                <div ng-click="vote(tweet, 'down')">
+                                    <a class="btn btn-sm">
+                                        <i class="fa fa-arrow-down"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-7 part body">
+                        <p class="text" ng-bind-html="tweet.text|html"></p>
+                        <p class="media text-center" ng-show="tweet.media">
+                            <a data-lightbox="lightbox" href="[! tweet.media !]" target="_blank">
+                                <img src="[! tweet.media !]">
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-danger" ng-show="failure_1">
             <i class="fa fa-fw fa-exclamation-triangle"></i>
             An unknown error has occurred. Please try again.
         </div>
-        <div class="alert alert-danger" id="failure_2">
+        <div class="alert alert-danger" ng-show="failure_2">
             <i class="fa fa-fw fa-exclamation-triangle"></i>
             There are no tweets in the database. Please try again.
         </div>

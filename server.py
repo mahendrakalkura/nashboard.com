@@ -38,6 +38,7 @@ assets.url = application.static_url_path
 assets.url_expire = True
 assets.versions = 'hash'
 assets.register('javascripts', Bundle(
+    'vendor/angularjs/angular.js',
     'vendor/jquery/dist/jquery.js',
     'vendor/jquery-backstretch/jquery.backstretch.js',
     'vendor/jquery-timeago/jquery.timeago.js',

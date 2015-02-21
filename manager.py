@@ -93,7 +93,7 @@ def assets_():
 @decorators.profile(0)
 def process_1():
     with closing(database.session()) as session:
-        for handle in session.query(models.handle).order_by('id asc').all():
+        for handle in session.query(models.handle).order_by('id ASC').all():
             twitter_1.delay(handle.id)
 
 

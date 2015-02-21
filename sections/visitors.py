@@ -2,11 +2,12 @@
 
 from datetime import datetime, timedelta
 from difflib import SequenceMatcher
+from time import mktime
 
 from authomatic.extras.flask import FlaskAuthomatic
 from authomatic.providers import oauth1
 from bleach import linkify
-from flask import abort, Blueprint, flash, g, redirect, render_template, request, session, url_for
+from flask import abort, Blueprint, flash, g, jsonify, redirect, render_template, request, session, url_for
 from pytz import utc
 
 from modules import forms, models, utilities
@@ -30,21 +31,24 @@ twitter = FlaskAuthomatic(
 
 @blueprint.before_request
 def before_request():
-    g.categories = g.mysql.query(models.category).order_by('position asc').all()
-    g.neighborhoods = g.mysql.query(models.neighborhood).order_by('position asc').all()
+    g.categories = g.mysql.query(models.category).order_by('position ASC').all()
+    g.neighborhoods = g.mysql.query(models.neighborhood).order_by('position ASC').all()
     g.user = None
     if 'user' in session:
         g.user = g.mysql.query(models.user).get(session['user'])
 
 
 @blueprint.route('/')
-def dashboard():
-    return render_template('visitors/views/dashboard.html')
+@blueprint.route('/<int:category_id>')
+def dashboard(category_id=None):
+    if not category_id:
+        return redirect(url_for('visitors.dashboard', category_id=g.categories[0].id))
+    return render_template('visitors/views/dashboard.html', category_id=category_id)
 
 
-@blueprint.route('/ajax', methods=['POST'])
-def dashboard_ajax():
-    category = g.mysql.query(models.category).get(request.form['category_id'])
+@blueprint.route('/<int:category_id>/ajax', methods=['POST'])
+def dashboard_ajax(category_id):
+    category = g.mysql.query(models.category).get(category_id)
     if not category:
         abort(404)
     screen_names = []
@@ -74,15 +78,14 @@ def dashboard_ajax():
     for tweet in query.order_by('created_at DESC , favorites DESC , retweets DESC'):
         vote = None
         if g.user:
-            if vote:
-                vote = vote.direction
             vote = g.mysql.query(
                 models.vote,
             ).filter(
                 models.vote.user_id == g.user.id,
                 models.vote.tweet_id == tweet.id,
-                models.vote.direction == 'up',
             ).first()
+            if vote:
+                vote = vote.direction
         votes = g.mysql.query(
             models.vote,
         ).filter(
@@ -123,7 +126,8 @@ def dashboard_ajax():
             'retweets': tweet.retweets,
             'score': score,
             'text': linkify(tweet.text, [callback], parse_email=False, skip_pre=False),
-            'total_vote': total_vote,
+            'timestamp': mktime(tweet.created_at.timetuple()),
+            'url': url_for('visitors.handles', screen_name=tweet.user_screen_name),
             'user_name': tweet.user_name,
             'user_profile_image_url': tweet.user_profile_image_url,
             'user_screen_name': tweet.user_screen_name,
@@ -135,10 +139,12 @@ def dashboard_ajax():
         tweets = sorted(
             tweets,
             key=lambda tweet: (
-                -tweet['score'], -tweet['votes'], -tweet['created_at'], -tweet['favorites'], -tweet['retweets'],
+                -tweet['score'], -tweet['votes'], -tweet['timestamp'], -tweet['favorites'], -tweet['retweets'],
             )
         )
-    return render_template('visitors/views/dashboard_ajax.html', tweets=tweets)
+    return jsonify({
+        'tweets': tweets,
+    })
 
 
 @blueprint.route('/dashboard/vote', methods=['POST'])
@@ -196,7 +202,9 @@ def handles_ajax(screen_name):
             'user_profile_image_url': tweet.user_profile_image_url,
             'user_screen_name': tweet.user_screen_name,
         })
-    return render_template('visitors/views/handles_ajax.html', tweets=tweets)
+    return jsonify({
+        'tweets': tweets,
+    })
 
 
 @blueprint.route('/users/sign-up', methods=['GET', 'POST'])
@@ -269,7 +277,7 @@ def users_sign_in_twitter():
             if not instance:
                 flash('You have not been signed in successfully.', 'danger')
                 return redirect(url_for('visitors.users_sign_in'))
-            session['visitor'] = instance.id
+            session['user'] = instance.id
             flash('You have been signed in successfully.', 'success')
             return redirect(url_for('visitors.dashboard'))
     return twitter.response

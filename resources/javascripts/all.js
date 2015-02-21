@@ -1,177 +1,169 @@
+var application = angular.module('application', []);
+
+application.config(function ($httpProvider, $interpolateProvider) {
+    $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    $interpolateProvider.startSymbol('[!').endSymbol('!]');
+});
+
+application.controller('dashboard', [
+    '$attrs',
+    '$http',
+    '$rootScope',
+    '$scope',
+    '$timeout',
+    function ($attrs, $http, $rootScope, $scope, $timeout) {
+        $rootScope.neighborhood = true;
+
+        $rootScope.overlay = false;
+        $rootScope.spinner = false;
+
+        $scope.mode = 'real_time';
+
+        $scope.tweets = [];
+
+        $scope.failure_1 = false;
+        $scope.failure_2 = false;
+
+        $scope.refresh = function () {
+            $rootScope.overlay = true;
+            $rootScope.spinner = true;
+            $http({
+                data: jQuery.param({
+                    mode: $scope.mode,
+                    neighborhood_id: $scope.neighborhood_id
+                }),
+                method: 'POST',
+                url: $attrs.urlRefresh
+            }).
+            error(function (data, status, headers, config) {
+                $rootScope.overlay = false;
+                $rootScope.spinner = false;
+
+                $scope.tweets = [];
+
+                $scope.failure_1 = true;
+                $scope.failure_2 = false;
+
+                $timeout($scope.refresh, 10000);
+            }).
+            success(function (data, status, headers, config) {
+                $rootScope.overlay = false;
+                $rootScope.spinner = false;
+
+                $scope.tweets = data.tweets;
+
+                $scope.failure_1 = false;
+                $scope.failure_2 = false;
+
+                if (!$scope.tweets.length) {
+                    $scope.failure_1 = false;
+                    $scope.failure_2 = true;
+                }
+
+                $timeout($scope.refresh, 60000);
+            });
+        };
+
+        $scope.vote = function (tweet, direction) {
+            $http({
+                data: jQuery.param({
+                    direction: direction,
+                    tweet_id: tweet.id
+                }),
+                method: 'POST',
+                url: $attrs.urlVote
+            }).
+            success(function (data, status, headers, config) {
+                tweet.vote = direction;
+            });
+        };
+
+
+        $scope.$watch('neighborhood_id', function (new_value, old_value) {
+            $scope.refresh();
+        }, true);
+
+        $scope.$watch('mode', function (new_value, old_value) {
+            $scope.refresh();
+        }, true);
+
+        $scope.refresh();
+    }
+]);
+
+application.controller('handles', [
+    '$attrs',
+    '$http',
+    '$rootScope',
+    '$scope',
+    '$timeout',
+    function ($attrs, $http, $rootScope, $scope, $timeout) {
+        $rootScope.overlay = false;
+        $rootScope.spinner = false;
+
+        $scope.tweets = [];
+
+        $scope.failure_1 = false;
+        $scope.failure_2 = false;
+
+        $scope.refresh = function () {
+            $rootScope.overlay = true;
+            $rootScope.spinner = true;
+            $http({
+                method: 'POST',
+                url: $attrs.url
+            }).
+            error(function (data, status, headers, config) {
+                $rootScope.overlay = false;
+                $rootScope.spinner = false;
+
+                $scope.tweets = [];
+
+                $scope.failure_1 = true;
+                $scope.failure_2 = false;
+
+                $timeout($scope.refresh, 10000);
+            }).
+            success(function (data, status, headers, config) {
+                $rootScope.overlay = false;
+                $rootScope.spinner = false;
+
+                $scope.tweets = data.tweets;
+
+                $scope.failure_1 = false;
+                $scope.failure_2 = false;
+
+                if (!$scope.tweets.length) {
+                    $scope.failure_1 = false;
+                    $scope.failure_2 = true;
+                }
+
+                $timeout($scope.refresh, 60000);
+            });
+        };
+
+        $scope.refresh();
+    }
+]);
+
+application.directive('tweet', function () {
+    return {
+        link: function (scope, element, attr) {
+            scope.$watch('tweet', function (new_value, old_value) {
+                jQuery(element).find('.created_at').timeago();
+            });
+        },
+        restrict: 'A'
+    };
+});
+
+application.filter('html', function ($sce) {
+    return function (html) {
+        return $sce.trustAsHtml(html);
+    };
+});
+
 jQuery(function () {
-    var body = jQuery('body');
-    var neighborhood_id = jQuery('.top [name="neighborhood_id"]');
-    var timeout = null;
-
-    var dashboard_ajax = function (category_id) {
-        window.location.hash = '#' + category_id;
-        var dashboard = jQuery('#dashboard');
-        var tweets = dashboard.find('#tweets');
-        var failure_1 = dashboard.find('#failure_1');
-        var failure_2 = dashboard.find('#failure_2');
-        var overlay = jQuery('#overlay');
-        var spinner = jQuery('#spinner');
-        failure_1.addClass('hide');
-        failure_2.addClass('hide');
-        overlay.removeClass('hide');
-        spinner.removeClass('hide');
-        jQuery.ajax({
-            cache: false,
-            data: {
-                category_id: category_id,
-                data_type: 'realtime',
-                neighborhood_id: neighborhood_id.val()
-            },
-            timeout: 30000,
-            type: 'POST',
-            url: dashboard.attr('data-url')
-        }).then(
-            function (data, textStatus, jqXHR) {
-                overlay.addClass('hide');
-                spinner.addClass('hide');
-                jQuery(
-                    jQuery(data).find('.tweet').get().reverse()
-                ).each(function () {
-                    dashboard_vote();
-                    var $this = jQuery(this);
-                    if (tweets.find(
-                        '.tweet[data-id="' + $this.attr('data-id') + '"]'
-                    ).length) {
-                        return;
-                    }
-                    $this.find('.created_at').timeago();
-                    tweets.prepend($this);
-                });
-                if (!tweets.find('.tweet').length) {
-                    failure_2.removeClass('hide');
-                }
-                dashboard_refresh(category_id);
-            },
-            function (jqXHR, textStatus, errorThrown) {
-                overlay.addClass('hide');
-                spinner.addClass('hide');
-                failure_1.removeClass('hide');
-                dashboard_refresh(category_id);
-            }
-        );
-    };
-
-    var dashboard_vote = function () {
-        jQuery('body').on('click', '.up-vote , .down-vote', function () {
-            var $this = jQuery(this);
-            jQuery.ajax({
-                cache: false,
-                data: {
-                      direction: $this.attr('data-direction'),
-                      tweet_id: $this.attr('data-tweet-id')
-                },
-                type: 'POST',
-                url: $this.attr('data-url')
-            }).then(
-                function () {
-                    $this.parent().hide();
-                }
-            );
-        });
-    };
-
-    jQuery('body').on('click', '.realtime , .whathot', function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        var $this = jQuery(this);
-        jQuery.ajax({
-            cache: false,
-            data: {
-                category_id: window.location.hash.substr(1),
-                data_type: $this.attr('data-type'),
-                neighborhood_id: jQuery('.top [name="neighborhood_id"]').val()
-            },
-            type: 'POST',
-            url: $this.attr('data-url')
-        }).then(
-            function (data, textStatus, jqXHR) {
-                var dashboard = jQuery('#dashboard');
-                var tweets = dashboard.find('#tweets')
-                tweets.find('.tweet').remove();
-                jQuery(
-                    jQuery(data).find('.tweet').get().reverse()
-                ).each(function () {
-                    var $this = jQuery(this);
-                    $this.find('.created_at').timeago();
-                    tweets.prepend($this);
-                });
-            },
-            function (jqXHR, textStatus, errorThrown) {
-            }
-        )
-    });
-
-    var dashboard_refresh = function (category_id) {
-        timeout = window.setTimeout(function () {
-            dashboard_ajax(category_id);
-        }, 30000);
-    };
-
-    var handles_ajax = function () {
-        var handles = jQuery('#handles');
-        var tweets = handles.find('#tweets');
-        var failure_1 = handles.find('#failure_1');
-        var failure_2 = handles.find('#failure_2');
-        var overlay = jQuery('#overlay');
-        var spinner = jQuery('#spinner');
-        failure_1.addClass('hide');
-        failure_2.addClass('hide');
-        overlay.removeClass('hide');
-        spinner.removeClass('hide');
-        jQuery.ajax({
-            cache: false,
-            data: {},
-            timeout: 30000,
-            type: 'POST',
-            url: handles.attr('data-url')
-        }).then(
-            function (data, textStatus, jqXHR) {
-                overlay.addClass('hide');
-                spinner.addClass('hide');
-                jQuery(
-                    jQuery(data).find('.tweet').get().reverse()
-                ).each(function () {
-                    var $this = jQuery(this);
-                    if (tweets.find(
-                        '.tweet[data-id="' + $this.attr('data-id') + '"]'
-                    ).length) {
-                        return;
-                    }
-                    $this.find('.created_at').timeago();
-                    tweets.prepend($this);
-                });
-                if (!tweets.find('.tweet').length) {
-                    failure_2.removeClass('hide');
-                }
-                handles_refresh();
-            },
-            function (jqXHR, textStatus, errorThrown) {
-                overlay.addClass('hide');
-                spinner.addClass('hide');
-                failure_1.removeClass('hide');
-                handles_refresh();
-            }
-        );
-    };
-
-    var handles_refresh = function () {
-        timeout = window.setTimeout(function () {
-            handles_ajax();
-        }, 30000);
-    };
-
-    jQuery('th input[type="checkbox"]').click(function(){
-        var $this = jQuery(this);
-        $this.closest('table').find('td input[type="checkbox"]').prop(
-            'checked', $this.is(':checked')
-        );
-    });
-
     jQuery(window).scroll(function() {
         var w = jQuery(window).scrollTop();
         if (w >= jQuery('header nav').height()) {
@@ -181,41 +173,13 @@ jQuery(function () {
         }
     });
 
-    if (!!body.attr('data-background')) {
-        jQuery.backstretch(body.attr('data-background'));
-    }
+    jQuery('th input[type="checkbox"]').click(function(){
+        var $this = jQuery(this);
+        $this.closest('table').find('td input[type="checkbox"]').prop(
+            'checked', $this.is(':checked')
+        );
+    });
 
-    if (jQuery('#dashboard').length) {
-        jQuery('.nav li a[data-id]').click(function () {
-            jQuery('.tweet').remove();
-            window.clearTimeout(timeout);
-            var $this = jQuery(this);
-            jQuery('.nav li').removeClass('active');
-            $this.parent().addClass('active');
-            dashboard_ajax($this.attr('data-id'));
-
-            //hide the navbar after click
-            if (jQuery('.navbar-toggle').css('display') != 'none' && jQuery('.navbar-collapse').hasClass('in')) {
-                jQuery('.navbar-toggle').click();
-            }
-
-            return false;
-        });
-
-        jQuery('.top [name="neighborhood_id"]').change(function () {
-            var id = window.location.hash.substr(1);
-            if (id.length) {
-                jQuery('.nav li a[data-id="' + id + '"]').click();
-            } else {
-                jQuery('.nav li a[data-id]:first').click();
-            }
-            return false;
-        }).change();
-    }
-    if (jQuery('#handles').length) {
-        jQuery('.top [name="neighborhood_id"]').hide();
-        handles_ajax();
-    }
     jQuery('#summary').wysihtml5({
         'blockquote': true,
         'color': true,
@@ -229,4 +193,8 @@ jQuery(function () {
             'fa': true
         }
     });
+
+    if (!!jQuery('body').attr('data-background')) {
+        jQuery.backstretch(jQuery('body').attr('data-background'));
+    }
 });

@@ -1,7 +1,7 @@
 {% import 'macros.html' as macros with context %}
 
 <!doctype html>
-<html lang="en">
+<html lang="en" ng-app="application">
     <head>
         <link href="{{ url_for('static', filename='images/favicon.ico') }}" rel="shortcut icon">
         <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
@@ -56,15 +56,15 @@
                             target="_blank"
                             ></a>
                         <a class="fa fa-twitter" href="https://twitter.com/Nash_Board" target="_blank"></a>
-                        <select name="neighborhood_id">
-                            <option value="0">Filter By Neighborhood</option>
+                        <select ng-model="neighborhood_id" ng-show="neighborhood">
+                            <option value="">Filter By Neighborhood</option>
                             {% for neighborhood in g.neighborhoods %}
                                 <option value="{{ neighborhood.id }}">{{ neighborhood.name }}</option>
                             {% endfor %}
                         </select>
                         {% if g.user %}
                             <div class="btn-group">
-                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button">
+                                <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">
                                     {% if g.user.twitter_screen_name %}
                                         {{ g.user.twitter_screen_name }}
                                     {% else %}
@@ -72,12 +72,9 @@
                                     {% endif %}
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu" role="menu">
+                                <ul class="dropdown-menu">
                                     <li>
-                                        <a href="{{ url_for('visitors.users_sign_out') }}">
-                                            <i class="fa fa-fw fa-home"></i>
-                                            Sign out
-                                        </a>
+                                        <a href="{{ url_for('visitors.users_sign_out') }}">Sign Out</a>
                                     </li>
                                 </ul>
                             </div>
@@ -90,10 +87,9 @@
                         <ul class="nav navbar-nav">
                             {% for category in g.categories %}
                                 <li>
-                                    <a
-                                        href="{{ url_for('visitors.dashboard') }}#{{ category.id }}"
-                                        data-id="{{ category.id }}"
-                                        >{{ category.name }}</a>
+                                    <a href="{{ url_for('visitors.dashboard', category_id=category.id) }}">
+                                        {{ category.name }}
+                                    </a>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -101,20 +97,6 @@
                 </div>
             </nav>
         </header>
-        {% if g.user %}
-            <div class="buttons">
-                <div class="btn btn btn-default pull-right">
-                    <div class="whathot" data-type="whathot" data-url="{{ url_for('visitors.dashboard_ajax') }}">
-                        What's Hot
-                    </div>
-                </div>
-                <div class="btn btn btn-default pull-right">
-                    <div class="realtime" data-type="realtime" data-url="{{ url_for('visitors.dashboard_ajax') }}">
-                        Real Time
-                    </div>
-                </div>
-            </div>
-        {% endif %}
         <div class="container">
             <div class="row">
                 <div class="col-md-9 col-md-offset-3">
@@ -147,8 +129,8 @@
                 </footer>
             </div>
         </div>
-        <div class="hide" id="overlay"></div>
-        <div class="hide" id="spinner"></div>
+        <div id="overlay" ng-show="overlay"></div>
+        <div id="spinner" ng-show="spinner"></div>
         {% assets "javascripts" %}
             <script src="{{ ASSET_URL }}" type="text/javascript"></script>
         {% endassets %}

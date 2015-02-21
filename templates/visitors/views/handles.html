@@ -6,34 +6,60 @@
     <div
         class="row"
         data-url="{{ url_for('visitors.handles_ajax', screen_name=handle.screen_name) }}"
-        id="handles"
+        ng-controller="handles"
         >
         <div class="tweet row">
             <div class="col-sm-3 part info">
-                <a
-                    class="user_profile_image_url"
-                    href="https://twitter.com/{{ handle.screen_name }}"
-                    target="_blank"
-                    >
+                <a class="user_profile_image_url" href="https://twitter.com/{{ handle.screen_name }}" target="_blank">
                     <img src="{{ handle.profile_image_url}}">
                 </a>
-                <a
-                    class="user_screen_name"
-                    href="https://twitter.com/{{ handle.screen_name }}"
-                    target="_blank"
-                    >{{ handle.name }}</a>
+                <a class="user_screen_name" href="https://twitter.com/{{ handle.screen_name }}" target="_blank">
+                    {{ handle.name }}
+                </a>
             </div>
             <div class="col-sm-7 part body">
                 <p class="text">{{ handle.summary|safe }}</p>
             </div>
         </div>
         <hr>
-        <div id="tweets"></div>
-        <div class="alert alert-danger" id="failure_1">
+        <div id="tweets">
+            <div ng-repeat="tweet in tweets" tweet="tweet">
+                <div
+                    class="tweet row"
+                    data-id="[! tweet.id !]"
+                    title="[! tweet.favorites !] favorites - [! tweet.retweets !] retweets"
+                    >
+                    <div class="col-sm-3 part info">
+                        <a
+                            class="user_profile_image_url"
+                            href="https://twitter.com/[! tweet.user_screen_name !]"
+                            target="_blank"
+                            >
+                            <img src="[! tweet.user_profile_image_url !]">
+                        </a>
+                        <a
+                            class="user_screen_name"
+                            href="https://twitter.com/[! tweet.user_screen_name !]"
+                            target="_blank"
+                            >[! tweet.user_name !]</a>
+                        <p class="created_at" title="[! tweet.created_at !]">[! tweet.created_at !]</p>
+                    </div>
+                    <div class="col-sm-7 part body">
+                        <p class="text" ng-bind-html="tweet.text|html"></p>
+                        <p class="media text-center" ng-show="tweet.media">
+                            <a data-lightbox="lightbox" href="[! tweet.media !]" target="_blank">
+                                <img src="[! tweet.media !]">
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-danger" ng-show="failure_1">
             <i class="fa fa-fw fa-exclamation-triangle"></i>
             An unknown error has occurred. Please try again.
         </div>
-        <div class="alert alert-danger" id="failure_2">
+        <div class="alert alert-danger" ng-show="failure_2">
             <i class="fa fa-fw fa-exclamation-triangle"></i>
             There are no tweets in the database. Please try again.
         </div>
