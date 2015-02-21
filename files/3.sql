@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
 DROP TABLE IF EXISTS `visitors`;
 CREATE TABLE IF NOT EXISTS `visitors` (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -6,5 +8,6 @@ CREATE TABLE IF NOT EXISTS `visitors` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `email` (`email`),
     KEY `timestamp` (`timestamp`)
-)
-ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+
+SET FOREIGN_KEY_CHECKS = 1;

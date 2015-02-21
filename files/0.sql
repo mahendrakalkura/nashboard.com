@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS `settings` (
     `value` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `key` (`key`)
-)
-ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE IF NOT EXISTS `categories` (
@@ -18,8 +17,7 @@ CREATE TABLE IF NOT EXISTS `categories` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `name` (`name`),
     KEY `position` (`position`)
-)
-ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 DROP TABLE IF EXISTS `handles`;
 CREATE TABLE IF NOT EXISTS `handles` (
@@ -32,8 +30,7 @@ CREATE TABLE IF NOT EXISTS `handles` (
     UNIQUE KEY `name` (`name`),
     KEY `profile_image_url` (`profile_image_url`),
     KEY `screen_name` (`screen_name`)
-)
-ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 DROP TABLE IF EXISTS `categories_handles`;
 CREATE TABLE IF NOT EXISTS `categories_handles` (
@@ -42,8 +39,7 @@ CREATE TABLE IF NOT EXISTS `categories_handles` (
     `handle_id` INT(11) UNSIGNED NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `category_id_handle_id` (`category_id`, `handle_id`)
-)
-ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 DROP TABLE IF EXISTS `tweets`;
 CREATE TABLE IF NOT EXISTS `tweets` (
@@ -54,8 +50,7 @@ CREATE TABLE IF NOT EXISTS `tweets` (
     `text` TEXT COLLATE utf8_unicode_ci NOT NULL,
     PRIMARY KEY (`id`),
     KEY `created_at` (`created_at`)
-)
-ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
 ALTER TABLE `categories_handles`
     ADD CONSTRAINT `categories_handles_category_id`

@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
 DROP TABLE IF EXISTS `tweets`;
 CREATE TABLE IF NOT EXISTS `tweets` (
     `id` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -12,5 +14,6 @@ CREATE TABLE IF NOT EXISTS `tweets` (
     PRIMARY KEY (`id`),
     KEY `created_at` (`created_at`),
     KEY `user_screen_name` (`user_screen_name`)
-)
-ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+
+SET FOREIGN_KEY_CHECKS = 1;

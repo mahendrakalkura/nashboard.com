@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
 DROP TABLE IF EXISTS `neighborhoods`;
 CREATE TABLE IF NOT EXISTS `neighborhoods` (
     `id` INTEGER(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -6,14 +8,11 @@ CREATE TABLE IF NOT EXISTS `neighborhoods` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `name` (`name`),
     KEY `position` (`position`)
-)
-ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=0;
 
-INSERT INTO `neighborhoods` (`id`, `name`, `position`) VALUES
-    (1, 'Neighborhood #1', '1');
+INSERT INTO `neighborhoods` (`id`, `name`, `position`) VALUES (1, 'Neighborhood #1', '1');
 
-ALTER TABLE `handles`
-    ADD `neighborhood_id` INT(11) UNSIGNED NOT NULL AFTER `id`;
+ALTER TABLE `handles` ADD `neighborhood_id` INT(11) UNSIGNED NOT NULL AFTER `id`;
 
 UPDATE `handles` SET `neighborhood_id` = 1;
 
@@ -25,3 +24,5 @@ ALTER TABLE `handles`
     REFERENCES `neighborhoods` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE;
+
+SET FOREIGN_KEY_CHECKS = 1;
