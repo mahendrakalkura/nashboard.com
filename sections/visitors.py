@@ -33,8 +33,8 @@ twitter = FlaskAuthomatic(
     config={
         'twitter': {
             'class_': oauth1.Twitter,
-            'consumer_key': CONSUMER_KEY,
-            'consumer_secret': CONSUMER_SECRET,
+            'consumer_key': TWITTER_CONSUMER_KEY,
+            'consumer_secret': TWITTER_CONSUMER_SECRET,
         },
     },
     debug=DEBUG,

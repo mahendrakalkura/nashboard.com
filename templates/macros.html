@@ -35,6 +35,25 @@
     {{ form.hidden_tag() }}
 {% endmacro %}
 
+{% macro js() %}
+    <script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-51070172-1', 'nashboard.com']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script');
+            ga.async = true;
+            ga.src = (
+                'https:' == document.location.protocol? 'https://ssl': 'http://www'
+            ) + '.google-analytics.com/ga.js';
+            ga.type = 'text/javascript';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+{% endmacro %}
+
 {% macro pagination(route, pager) %}
     <div class="pagination_">
         <span class="pull-left">
