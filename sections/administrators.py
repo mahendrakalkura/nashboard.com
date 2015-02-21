@@ -5,7 +5,7 @@ from csv import QUOTE_ALL, writer
 
 from flask import abort, Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
 
-from modules import classes, decorators, filters, forms, models,utilities
+from modules import classes, decorators, filters, forms, models, utilities
 
 blueprint = Blueprint('administrators', __name__)
 
@@ -359,9 +359,9 @@ def visitors_export():
             visitor.timestamp.isoformat(' '),
         ]
         for visitor in filters.visitors(
-            **filters_,
+            **filters_
         ).apply(
-            g.mysql.query(models.visitor),
+            g.mysql.query(models.visitor)
         ).order_by('timestamp desc').all()
     ])
     return Response(

@@ -9,7 +9,7 @@ from bleach import linkify
 from flask import abort, Blueprint, flash, g, redirect, render_template, request, session, url_for
 from pytz import utc
 
-from modules import form, model, utilities
+from modules import forms, models, utilities
 
 from settings import DEBUG, SECRET_KEY, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET
 

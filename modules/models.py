@@ -186,6 +186,9 @@ class vote(database.base):
         'autoload': True,
     }
 
+    user = relationship('user', backref=backref('votes', cascade='all,delete-orphan', lazy='dynamic'))
+    tweet = relationship('tweet', backref=backref('votes', cascade='all,delete-orphan', lazy='dynamic'))
+
 
 def swap(one, two):
     one.position, two.position = two.position, one.position
