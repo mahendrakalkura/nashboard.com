@@ -176,15 +176,26 @@ class category_handle(database.base):
     )
 
 
-class tweet(database.base):
-    __tablename__ = 'tweets'
+class visitor(database.base):
+    __tablename__ = 'visitors'
+    __table_args__ = {
+        'autoload': True,
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(visitor, self).__init__(*args, **kwargs)
+        self.timestamp = datetime.now()
+
+
+class user(database.base):
+    __tablename__ = 'users'
     __table_args__ = {
         'autoload': True,
     }
 
 
-class user(database.base):
-    __tablename__ = 'users'
+class tweet(database.base):
+    __tablename__ = 'tweets'
     __table_args__ = {
         'autoload': True,
     }
@@ -195,17 +206,6 @@ class vote(database.base):
     __table_args__ = {
         'autoload': True,
     }
-
-
-class visitor(database.base):
-    __tablename__ = 'visitors'
-    __table_args__ = {
-        'autoload': True,
-    }
-
-    def __init__(self, *args, **kwargs):
-        super(visitor, self).__init__(*args, **kwargs)
-        self.timestamp = datetime.now()
 
 
 def swap(one, two):
