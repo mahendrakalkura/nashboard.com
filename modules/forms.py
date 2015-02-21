@@ -137,22 +137,20 @@ class users_sign_up(Form):
     email = TextField(
         validators=[validators.required(), validators.email(), validators.unique(table='users', columns=[])]
     )
-    password = PasswordField(validators=[validators.required()])
-    confirm = PasswordField(label='Confirm Password', validators=[validators.required()])
+    password_1 = PasswordField(label='Password', validators=[validators.required()])
+    password_2 = PasswordField(label='Password (Repeat)', validators=[validators.required()])
 
     def validate(self):
         if super(users_sign_up, self).validate():
-            if self.password.data == self.confirm.data:
+            if self.password_1.data == self.password_2.data:
                 return True
-            self.password.errors = [
-                'password and confirm password are different',
-            ]
+            self.password_1.errors = ['Invalid Password']
+            self.password_2.errors = ['Invalid Password']
             return False
 
     def get_instance(self, user):
-        password = hashpw(self.password.data.encode('utf-8'), gensalt(10))
         user.email = self.email.data
-        user.password = password
+        user.password = hashpw(self.password_1.data.encode('utf-8'), gensalt(10))
         return user
 
 
@@ -163,7 +161,7 @@ class users_sign_in(Form):
     def validate(self):
         if super(users_sign_in, self).validate():
             instance = g.mysql.query(
-                models.user
+                models.user,
             ).filter(
                 models.user.email == self.email.data,
             ).first()

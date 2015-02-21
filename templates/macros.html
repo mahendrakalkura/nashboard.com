@@ -29,7 +29,7 @@
 {% macro form(form) %}
     {% for field in form %}
         {% if not field.type in ['CSRFTokenField', 'HiddenField'] %}
-            {{ widget(field, class=class, **kwargs) }}
+            {{ widget_1(field, class=class, **kwargs) }}
         {% endif %}
     {% endfor %}
     {{ form.hidden_tag() }}
@@ -157,7 +157,7 @@
     </th>
 {% endmacro %}
 
-{% macro widget(field) %}
+{% macro widget_1(field) %}
     {% set class = [] %}
     {% if field.flags.required %}
         {% do class.append('required') %}
@@ -171,6 +171,49 @@
             for="{{ field.label.field_id}}"
             >{{ field.label.text }}</label>
         <div class="col-lg-10 col-md-10">
+            {% set class = [] %}
+            {% if 'class' in kwargs and kwargs['class'] %}
+                {% do class.append(kwargs['class']) %}
+            {% endif %}
+            {% do class.append('col-lg-10') %}
+            {% do class.append('col-md-10') %}
+            {% do class.append('form-control') %}
+            {% do kwargs.update(class=class|join(' ')) %}
+            {% if field.type == 'wysihtml5' %}
+                {{ field(wysihtml5=true, **kwargs)|safe }}
+            {% else %}
+                {{ field(**kwargs)|safe }}
+            {% endif %}
+            {% if field.description %}
+                {% for line in field.description %}
+                    <span class="help-block">
+                        <i class="fa fa-fw fa-info-circle"></i> {{ line }}
+                     </span>
+                {% endfor %}
+            {% endif %}
+            {% for error in field.errors %}
+                <span class="help-block">
+                    <i class="fa fa-fw fa-times-circle"></i> {{ error }}
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro widget_2(field) %}
+    {% set class = [] %}
+    {% if field.flags.required %}
+        {% do class.append('required') %}
+    {% endif %}
+    {% if field.errors|length %}
+        {% do class.append('has-error') %}
+    {% endif %}
+    <div class="form-group {{ class|join(' ') }}">
+        <label
+            class="col-lg-4 col-md-4 control-label"
+            for="{{ field.label.field_id}}"
+            >{{ field.label.text }}</label>
+        <div class="col-lg-8 col-md-8">
             {% set class = [] %}
             {% if 'class' in kwargs and kwargs['class'] %}
                 {% do class.append(kwargs['class']) %}

@@ -22,7 +22,7 @@
                     {{ tweet.created_at }}
                 </p>
                 <div id="vote-part">
-                    {% if g.visitor %}
+                    {% if g.user %}
                         Number of Vote: {{ tweet.total_vote }}
                         {% if tweet.vote != 'up' and tweet.vote != 'down' %}
                             <div class="buttons">
@@ -30,7 +30,7 @@
                                     class="up-vote"
                                     data-direction="up"
                                     data-tweet-id="{{ tweet.id }}"
-                                    data-url="{{ url_for('visitors.votes') }}"
+                                    data-url="{{ url_for('visitors.dashboard_vote') }}"
                                     >
                                     <a class="btn btn-sm">
                                         <i class="fa fa-arrow-up"></i>
@@ -40,7 +40,7 @@
                                     class="down-vote"
                                     data-direction="down"
                                     data-tweet-id="{{ tweet.id }}"
-                                    data-url="{{ url_for('visitors.votes') }}"
+                                    data-url="{{ url_for('visitors.dashboard_votes') }}"
                                     >
                                     <a class="btn btn-sm">
                                         <i class="fa fa-arrow-down"></i>

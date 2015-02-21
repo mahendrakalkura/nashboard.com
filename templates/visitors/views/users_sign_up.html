@@ -4,43 +4,42 @@
 {% set title = 'Sign Up' %}
 
 {% block component %}
-    <div class="row">
-        <div class="col-lg-12 col-md-12">
-            <div class="page-header">
-                <h1>
-                    <i class="fa fa-fw fa-map-marker"></i>
-                    {{ title }}
-                </h1>
-            </div>
-            <form
-                action="{{ url_for('visitors.users_sign_up', next=request.args.get('next')) }}"
-                class="form-horizontal"
-                method="post"
-                >
-                {{ macros.form(form) }}
-                <div class="form-group">
-                    <div
-                        class="col-lg-offset-2 col-lg-10"
-                        >
-                        <button class="btn btn-success" type="submit">
-                            <i class="fa fa-fw fa-dot-circle-o"></i>
-                            Submit
-                        </button>
-                        <button class="btn btn-danger" type="reset">
-                            <i class="fa fa-fw fa-circle-o"></i>
-                            Reset
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <div class="col-lg-offset-2">
+    <div class="normal row">
+        <div class="page-header">
+            <h1>
                 <a
-                    class="btn btn-primary"
-                    href="{{ url_for('visitors.social_sign_up', provider_id="twitter") }}">
+                    class="btn btn-default pull-right"
+                    href="{{ url_for('visitors.users_sign_up_twitter') }}"
+                    >
                     <i class="fa fa-fw fa-twitter"></i>
-                    Sign-up Using Twitter
+                    Sign Up Using Twitter
                 </a>
-            </div>
+                {{ title }}
+            </h1>
         </div>
+        <form
+            action="{{ url_for('visitors.users_sign_up', next=request.args.get('next')) }}"
+            class="form-horizontal"
+            method="post"
+            >
+            {% for field in form %}
+                {% if not field.type in ['CSRFTokenField', 'HiddenField'] %}
+                    {{ macros.widget_2(field, class=class) }}
+                {% endif %}
+            {% endfor %}
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <div class="col-lg-offset-4 col-lg-8">
+                    <button class="btn btn-success" type="submit">
+                        <i class="fa fa-fw fa-dot-circle-o"></i>
+                        Submit
+                    </button>
+                    <button class="btn btn-danger" type="reset">
+                        <i class="fa fa-fw fa-circle-o"></i>
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 {% endblock %}

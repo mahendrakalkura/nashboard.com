@@ -17,6 +17,43 @@ def before_request():
         g.administrator = True
 
 
+@blueprint.route('/profile', methods=['GET', 'POST'])
+@decorators.requires_administrator
+def profile():
+    form = forms.profile(
+        request.form,
+        username=g.mysql.query(models.setting).filter(models.setting.key == 'username').first().value,
+    )
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            form.persist()
+            flash('Your profile has been saved successfully.', 'success')
+            return redirect(url_for('administrators.profile'))
+        flash('Your profile has not been saved successfully.', 'danger')
+    return render_template('administrators/views/profile.html', form=form)
+
+
+@blueprint.route('/sign-in', methods=['GET', 'POST'])
+def sign_in():
+    if g.administrator:
+        return redirect(request.args.get('next') or url_for('administrators.dashboard'))
+    form = forms.sign_in(request.form)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            flash('You have been signed in successfully.', 'success')
+            return redirect(request.args.get('next') or url_for('administrators.dashboard'))
+        flash('You have not been signed in successfully.', 'danger')
+    return render_template('administrators/views/sign_in.html', form=form)
+
+
+@blueprint.route('/sign-out')
+def sign_out():
+    if 'administrator' in session:
+        del session['administrator']
+    flash('You have been signed out successfully.', 'success')
+    return redirect(url_for('administrators.dashboard'))
+
+
 @blueprint.route('/')
 @decorators.requires_administrator
 def dashboard():
@@ -371,40 +408,3 @@ def visitors_export():
         },
         mimetype='text/csv',
     )
-
-
-@blueprint.route('/profile', methods=['GET', 'POST'])
-@decorators.requires_administrator
-def profile():
-    form = forms.profile(
-        request.form,
-        username=g.mysql.query(models.setting).filter(models.setting.key == 'username').first().value,
-    )
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            form.persist()
-            flash('Your profile has been saved successfully.', 'success')
-            return redirect(url_for('administrators.profile'))
-        flash('Your profile has not been saved successfully.', 'danger')
-    return render_template('administrators/views/profile.html', form=form)
-
-
-@blueprint.route('/sign-in', methods=['GET', 'POST'])
-def sign_in():
-    if g.administrator:
-        return redirect(request.args.get('next') or url_for('administrators.dashboard'))
-    form = forms.sign_in(request.form)
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            flash('You have been signed in successfully.', 'success')
-            return redirect(request.args.get('next') or url_for('administrators.dashboard'))
-        flash('You have not been signed in successfully.', 'danger')
-    return render_template('administrators/views/sign_in.html', form=form)
-
-
-@blueprint.route('/sign-out')
-def sign_out():
-    if 'administrator' in session:
-        del session['administrator']
-    flash('You have been signed out successfully.', 'success')
-    return redirect(url_for('administrators.dashboard'))

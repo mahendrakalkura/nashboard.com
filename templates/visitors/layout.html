@@ -62,14 +62,13 @@
                                 <option value="{{ neighborhood.id }}">{{ neighborhood.name }}</option>
                             {% endfor %}
                         </select>
-                        <div class="clear hidden"></div>
-                        {% if g.visitor %}
+                        {% if g.user %}
                             <div class="btn-group">
                                 <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button">
-                                    {% if g.visitor.twitter_screen_name %}
-                                        {{ g.visitor.twitter_screen_name }}
+                                    {% if g.user.twitter_screen_name %}
+                                        {{ g.user.twitter_screen_name }}
                                     {% else %}
-                                        {{ g.visitor.email }}
+                                        {{ g.user.email }}
                                     {% endif %}
                                     <span class="caret"></span>
                                 </button>
@@ -83,8 +82,8 @@
                                 </ul>
                             </div>
                         {%else %}
-                            <a class="btn fa fa-user" href="{{ url_for('visitors.users_sign_up') }}"> sign up</a>
-                            <a class="btn fa fa-sign-in" href="{{ url_for('visitors.users_sign_in') }}"> sign in</a>
+                            <a class="btn fa fa-user" href="{{ url_for('visitors.users_sign_up') }}"> Sign Up</a>
+                            <a class="btn fa fa-sign-in" href="{{ url_for('visitors.users_sign_in') }}"> Sign In</a>
                         {% endif %}
                     </div>
                     <div class="bottom collapse navbar-collapse" id="actual-navbar">
@@ -102,7 +101,7 @@
                 </div>
             </nav>
         </header>
-        {% if g.visitor %}
+        {% if g.user %}
             <div class="buttons">
                 <div class="btn btn btn-default pull-right">
                     <div class="whathot" data-type="whathot" data-url="{{ url_for('visitors.dashboard_ajax') }}">
