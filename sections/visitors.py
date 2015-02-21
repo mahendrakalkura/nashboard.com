@@ -7,8 +7,8 @@ from authomatic.extras.flask import FlaskAuthomatic
 from authomatic.providers import oauth1
 from bleach import linkify
 from flask import (
-    Blueprint,
     abort,
+    Blueprint,
     flash,
     g,
     redirect,
