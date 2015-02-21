@@ -63,7 +63,7 @@ def dashboard():
 
 
 @blueprint.route('/users/sign-up', methods=['GET', 'POST'])
-def sign_up():
+def users_sign_up():
     form = forms.users_sign_up(request.form)
     user = models.user()
     form.id = user.id
@@ -80,9 +80,9 @@ def sign_up():
             'You have successfully Registerd. Please sign in to proceed',
             'success'
         )
-        return redirect(url_for('visitors.sign_in'))
+        return redirect(url_for('visitors.users_sign_in'))
 
-    return render_template('visitors/views/sign_up.html', form=form)
+    return render_template('visitors/views/users_sign_up.html', form=form)
 
 
 @blueprint.route('/sign-up/<provider_id>', methods=['GET', 'POST'])
@@ -91,7 +91,7 @@ def social_sign_up(provider_id=None):
     if twitter.result:
         if twitter.result.error:
             flash(twitter.result.error.message, 'danger')
-            return redirect(url_for('visitors.sign_up'))
+            return redirect(url_for('visitors.users_sign_up'))
         elif twitter.result.user:
             if not (twitter.result.user.name and twitter.result.user.id):
                 twitter.result.user.update()
@@ -105,7 +105,7 @@ def social_sign_up(provider_id=None):
                     'Please sign-in to continue',
                     'danger'
                 )
-                return redirect(url_for('visitors.sign_in'))
+                return redirect(url_for('visitors.users_sign_in'))
             else:
                 g.mysql.add(models.user(**{
                     'twitter_screen_name': twitter.result.user.name,
@@ -116,14 +116,14 @@ def social_sign_up(provider_id=None):
                     'Please sign-in to continue',
                     'success'
                 )
-                return redirect(url_for('visitors.sign_in'))
-            return redirect(url_for('visitors.sign_in'))
+                return redirect(url_for('visitors.users_sign_in'))
+            return redirect(url_for('visitors.users_sign_in'))
     else:
         return twitter.response
 
 
 @blueprint.route('/users/sign-in', methods=['GET', 'POST'])
-def sign_in():
+def users_sign_in():
     form = forms.users_sign_in(request.form)
     if g.visitor:
         return redirect(
@@ -137,7 +137,7 @@ def sign_in():
                 request.args.get('next') or url_for('visitors.dashboard')
             )
         flash('You have not been signed in successfully.', 'danger')
-    return render_template('visitors/views/sign_in.html', form=form)
+    return render_template('visitors/views/users_sign_in.html', form=form)
 
 
 @blueprint.route('/sign-in/<provider_id>', methods=['GET', 'POST'])
@@ -146,7 +146,7 @@ def social_sign_in(provider_id=None):
     if twitter.result:
         if twitter.result.error:
             flash(twitter.result.error.message, 'danger')
-            return redirect(url_for('visitors.sign_up'))
+            return redirect(url_for('visitors.users_sign_up'))
         elif twitter.result.user:
             if not (twitter.result.user.name and twitter.result.user.id):
                 twitter.result.user.update()
@@ -168,18 +168,18 @@ def social_sign_in(provider_id=None):
                     'Please Register first',
                     'danger'
                 )
-                return redirect(url_for('visitors.sign_up'))
-            return redirect(url_for('visitors.sign_in'))
+                return redirect(url_for('visitors.users_sign_up'))
+            return redirect(url_for('visitors.users_sign_in'))
     else:
         return twitter.response
 
 
-@blueprint.route('/sign-out')
-def sign_out():
+@blueprint.route('/users-sign-out')
+def users_sign_out():
     if 'visitor' in session:
         del session['visitor']
     flash('You have been signed out successfully.', 'success')
-    return redirect(url_for('visitors.sign_in'))
+    return redirect(url_for('visitors.users_sign_in'))
 
 
 @blueprint.route('/votes', methods=['POST'])

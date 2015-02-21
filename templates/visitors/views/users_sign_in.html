@@ -1,7 +1,7 @@
 {% extends 'visitors/layout.html' %}
 
-{% set navbar = 'sign_up' %}
-{% set title = 'Sign Up' %}
+{% set navbar = 'sign_in' %}
+{% set title = 'Sign In' %}
 
 {% block component %}
     <div class="row">
@@ -13,14 +13,14 @@
                 </h1>
             </div>
             <form
-                action="{{ url_for('visitors.sign_up', next=request.args.get('next')) }}"
+                action="{{ url_for('visitors.users_sign_in', next=request.args.get('next')) }}"
                 class="form-horizontal"
                 method="post"
                 >
                 {{ macros.form(form) }}
                 <div class="form-group">
                     <div
-                        class="col-lg-offset-2 col-lg-10"
+                        class="col-lg-offset-2 col-lg-10 col-md-offset-2 col-md-10"
                         >
                         <button class="btn btn-success" type="submit">
                             <i class="fa fa-fw fa-dot-circle-o"></i>
@@ -36,9 +36,9 @@
             <div class="col-lg-offset-2">
                 <a
                     class="btn btn-primary"
-                    href="{{ url_for('visitors.social_sign_up', provider_id="twitter") }}">
+                    href="{{ url_for('visitors.social_sign_in', provider_id="twitter") }}">
                     <i class="fa fa-fw fa-twitter"></i>
-                    Sign-up Using Twitter
+                    Sign-in Using Twitter
                 </a>
             </div>
         </div>

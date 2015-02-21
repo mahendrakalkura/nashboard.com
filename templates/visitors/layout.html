@@ -75,7 +75,7 @@
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
-                                        <a href="{{ url_for('visitors.sign_out') }}">
+                                        <a href="{{ url_for('visitors.users_sign_out') }}">
                                             <i class="fa fa-fw fa-home"></i>
                                             Sign out
                                         </a>
@@ -83,8 +83,8 @@
                                 </ul>
                             </div>
                         {%else %}
-                            <a class="btn fa fa-user" href="{{ url_for('visitors.sign_up') }}"> sign up</a>
-                            <a class="btn fa fa-sign-in" href="{{ url_for('visitors.sign_in') }}"> sign in</a>
+                            <a class="btn fa fa-user" href="{{ url_for('visitors.users_sign_up') }}"> sign up</a>
+                            <a class="btn fa fa-sign-in" href="{{ url_for('visitors.users_sign_in') }}"> sign in</a>
                         {% endif %}
                     </div>
                     <div class="bottom collapse navbar-collapse" id="actual-navbar">
