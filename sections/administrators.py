@@ -18,6 +18,7 @@ from flask import (
 
 from modules import classes
 from modules import decorators
+from modules import filters
 from modules import forms
 from modules import models
 from modules import utilities
@@ -60,7 +61,7 @@ def categories_overview():
 @decorators.requires_administrator
 def categories_add():
     category = models.category()
-    form = forms.categories_form(request.form, category)
+    form = forms.categories(request.form, category)
     form.id = category.id
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -81,7 +82,7 @@ def categories_edit(id):
     category = g.mysql.query(models.category).get(id)
     if not category:
         abort(404)
-    form = forms.categories_form(request.form, category)
+    form = forms.categories(request.form, category)
     form.id = category.id
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -191,7 +192,7 @@ def neighborhoods_position(id, direction):
 @decorators.requires_administrator
 def neighborhoods_add():
     neighborhood = models.neighborhood()
-    form = forms.neighborhoods_form(request.form, neighborhood)
+    form = forms.neighborhoods(request.form, neighborhood)
     form.id = neighborhood.id
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -212,7 +213,7 @@ def neighborhoods_edit(id):
     neighborhood = g.mysql.query(models.neighborhood).get(id)
     if not neighborhood:
         abort(404)
-    form = forms.neighborhoods_form(request.form, neighborhood)
+    form = forms.neighborhoods(request.form, neighborhood)
     form.id = neighborhood.id
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -246,7 +247,9 @@ def neighborhoods_delete(id):
 @blueprint.route('/handles/overview')
 @decorators.requires_administrator
 def handles_overview():
-    filters, order_by, limit, page = utilities.get_filters_order_by_limit_page(
+    (
+        filters_, order_by, limit, page
+    ) = utilities.get_filters_order_by_limit_page(
         'handles',
         {},
         {
@@ -256,7 +259,7 @@ def handles_overview():
         10,
         1
     )
-    form = forms.handles_filters(**filters)
+    form = filters.handles(**filters_)
     query = form.apply(g.mysql.query(models.handle))
     pager = classes.pager(query.count(), limit, page)
     return render_template(
@@ -274,7 +277,7 @@ def handles_overview():
 @decorators.requires_administrator
 def handles_add():
     handle = models.handle()
-    form = forms.handles_form(request.form, handle)
+    form = forms.handles(request.form, handle)
     form.id = handle.id
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -294,7 +297,7 @@ def handles_edit(id):
     handle = g.mysql.query(models.handle).get(id)
     if not handle:
         abort(404)
-    form = forms.handles_form(request.form, handle)
+    form = forms.handles(request.form, handle)
     form.id = handle.id
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -331,7 +334,7 @@ def handles_process():
     if request.method == 'GET':
         utilities.set_order_by_limit_page('handles')
     if request.method == 'POST':
-        utilities.set_filters('handles', forms.handles_filters)
+        utilities.set_filters('handles', filters.handles)
         if request.form['submit'] == 'delete':
             ids = request.form.getlist('ids')
             if ids:
@@ -353,7 +356,9 @@ def handles_process():
 @blueprint.route('/visitors/overview', methods=['GET', 'POST'])
 @decorators.requires_administrator
 def visitors_overview():
-    filters, order_by, limit, page = utilities.get_filters_order_by_limit_page(
+    (
+        filters_, order_by, limit, page
+    ) = utilities.get_filters_order_by_limit_page(
         'visitors',
         {},
         {
@@ -363,7 +368,7 @@ def visitors_overview():
         10,
         1
     )
-    form = forms.visitors_filters(**filters)
+    form = filters.visitors(**filters_)
     query = form.apply(g.mysql.query(models.visitor))
     pager = classes.pager(query.count(), limit, page)
     return render_template(
@@ -383,14 +388,14 @@ def visitors_process():
     if request.method == 'GET':
         utilities.set_order_by_limit_page('visitors')
     if request.method == 'POST':
-        utilities.set_filters('visitors', forms.visitors_filters)
+        utilities.set_filters('visitors', filters.visitors)
     return redirect(url_for('administrators.visitors_overview'))
 
 
 @blueprint.route('/visitors/export')
 @decorators.requires_administrator
 def visitors_export():
-    filters, _, _, _ = utilities.get_filters_order_by_limit_page(
+    filters_, _, _, _ = utilities.get_filters_order_by_limit_page(
         'visitors',
         {},
         {
@@ -419,8 +424,8 @@ def visitors_export():
             visitor.email,
             visitor.timestamp.isoformat(' '),
         ]
-        for visitor in forms.visitors_filters(
-            **filters
+        for visitor in filters.visitors(
+            **filters_
         ).apply(
             g.mysql.query(models.visitor)
         ).order_by('timestamp desc').all()

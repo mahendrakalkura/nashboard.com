@@ -62,9 +62,9 @@ def dashboard():
     return render_template('visitors/views/dashboard.html')
 
 
-@blueprint.route('/sign-up', methods=['GET', 'POST'])
+@blueprint.route('/users/sign-up', methods=['GET', 'POST'])
 def sign_up():
-    form = forms.sign_up(request.form)
+    form = forms.users_sign_up(request.form)
     user = models.user()
     form.id = user.id
 
@@ -122,9 +122,9 @@ def social_sign_up(provider_id=None):
         return twitter.response
 
 
-@blueprint.route('/sign-in', methods=['GET', 'POST'])
+@blueprint.route('/users/sign-in', methods=['GET', 'POST'])
 def sign_in():
-    form = forms.visitor_sign_in(request.form)
+    form = forms.users_sign_in(request.form)
     if g.visitor:
         return redirect(
             request.args.get('next') or url_for('visitors.dashboard')
@@ -399,7 +399,7 @@ def handles_ajax(screen_name):
 @blueprint.route('/stay-in-touch', methods=['GET', 'POST'])
 def stay_in_touch():
     visitor = models.visitor()
-    form = forms.visitors_form(request.form, visitor)
+    form = forms.visitors(request.form, visitor)
     form.id = visitor.id
     if request.method == 'POST':
         if form.validate_on_submit():

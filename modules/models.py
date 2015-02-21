@@ -213,3 +213,11 @@ def swap(one, two):
     g.mysql.add(one)
     g.mysql.add(two)
     g.mysql.commit()
+
+
+def get_categories():
+    return g.mysql.query(category).order_by('position asc').all()
+
+
+def get_neighborhoods():
+    return g.mysql.query(neighborhood).order_by('position asc').all()

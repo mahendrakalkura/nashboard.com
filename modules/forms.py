@@ -16,15 +16,7 @@ from modules import validators
 from modules import widgets
 
 
-def get_categories_factory():
-    return g.mysql.query(models.category).order_by('position asc').all()
-
-
-def get_neighborhoods_factory():
-    return g.mysql.query(models.neighborhood).order_by('position asc').all()
-
-
-class categories_form(Form):
+class categories(Form):
     name = TextField(
         label='Name',
         validators=[
@@ -47,12 +39,12 @@ class categories_form(Form):
         return category
 
 
-class handles_form(Form):
+class handles(Form):
     neighborhood = QuerySelectField(
         allow_blank=False,
         get_label='name',
         label='Neighborhood',
-        query_factory=get_neighborhoods_factory,
+        query_factory=models.get_neighborhoods,
         validators=[
             validators.required(),
         ],
@@ -88,7 +80,7 @@ class handles_form(Form):
         get_label='name',
         label='Categories',
         option_widget=CheckboxInput(),
-        query_factory=get_categories_factory,
+        query_factory=models.get_categories,
         validators=[validators.required()],
         widget=widgets.list(prefix_label=False),
     )
@@ -103,43 +95,7 @@ class handles_form(Form):
         return handle
 
 
-class handles_filters(Form):
-    screen_name = TextField(label='Screen Name')
-    name = TextField(label='Name')
-    category = SelectField(choices=[], default='')
-
-    def __init__(self, *args, **kwargs):
-        super(handles_filters, self).__init__(*args, **kwargs)
-        self.category.choices = [('', 'All')] + [
-            (category.id, category.name)
-            for category in get_categories_factory()
-        ]
-
-    def apply(self, query):
-        if self.screen_name.data:
-            query = query.filter(
-                models.handle.screen_name.like('%%%(screen_name)s%%' % {
-                    'screen_name': self.screen_name.data,
-                })
-            )
-        if self.name.data:
-            query = query.filter(
-                models.handle.name.like('%%%(name)s%%' % {
-                    'name': self.name.data,
-                })
-            )
-        if self.category.data:
-            query = query.join(
-                models.category_handle,
-            ).join(
-                models.category,
-            ).filter(
-                models.category.id == self.category.data,
-            )
-        return query
-
-
-class neighborhoods_form(Form):
+class neighborhoods(Form):
     name = TextField(validators=[
         validators.required(),
         validators.unique(table='neighborhoods', columns=[]),
@@ -171,62 +127,6 @@ class profile(Form):
             'value': hashpw(self.password.data.encode('utf-8'), gensalt(10)),
         })
         g.mysql.commit()
-
-
-class sign_up(Form):
-    email = TextField(
-        validators=[
-            validators.required(),
-            validators.email(),
-            validators.unique(table='users', columns=[])
-        ]
-    )
-    password = PasswordField(validators=[validators.required()])
-    confirm = PasswordField(
-        label='Confirm Password',
-        validators=[validators.required()]
-    )
-
-    def validate(self):
-        if super(sign_up, self).validate():
-            if self.password.data == self.confirm.data:
-                return True
-            self.password.errors = [
-                'password and confirm password are different'
-            ]
-            return False
-
-    def get_instance(self, user):
-        password = hashpw(self.password.data.encode('utf-8'), gensalt(10))
-        user.email = self.email.data
-        user.password = password
-        return user
-
-
-class visitor_sign_in(Form):
-    email = TextField(validators=[validators.required(), validators.email()])
-    password = PasswordField(validators=[validators.required()])
-
-    def validate(self):
-        if super(visitor_sign_in, self).validate():
-            instance = g.mysql.query(
-                models.user
-            ).filter(
-                models.user.email == self.email.data,
-            ).first()
-            if (
-                instance
-                and
-                hashpw(
-                    self.password.data.encode('utf-8'),
-                    instance.password.encode('utf-8'),
-                ) == instance.password
-            ):
-                session['visitor'] = instance.id
-                return True
-        self.email.errors = ['Invalid Username/Password']
-        self.password.errors = []
-        return False
 
 
 class sign_in(Form):
@@ -262,7 +162,7 @@ class sign_in(Form):
         return False
 
 
-class visitors_form(Form):
+class visitors(Form):
     email = TextField(validators=[
         validators.required(),
         validators.email(),
@@ -274,14 +174,57 @@ class visitors_form(Form):
         return visitor
 
 
-class visitors_filters(Form):
-    email = TextField(validators=[
-        validators.required(),
-    ])
+class users_sign_up(Form):
+    email = TextField(
+        validators=[
+            validators.required(),
+            validators.email(),
+            validators.unique(table='users', columns=[])
+        ]
+    )
+    password = PasswordField(validators=[validators.required()])
+    confirm = PasswordField(
+        label='Confirm Password',
+        validators=[validators.required()]
+    )
 
-    def apply(self, query):
-        if self.email.data:
-            query = query.filter(models.visitor.email.like('%%%(email)s%%' % {
-                'email': self.email.data,
-            }))
-        return query
+    def validate(self):
+        if super(users_sign_up, self).validate():
+            if self.password.data == self.confirm.data:
+                return True
+            self.password.errors = [
+                'password and confirm password are different'
+            ]
+            return False
+
+    def get_instance(self, user):
+        password = hashpw(self.password.data.encode('utf-8'), gensalt(10))
+        user.email = self.email.data
+        user.password = password
+        return user
+
+
+class users_sign_in(Form):
+    email = TextField(validators=[validators.required(), validators.email()])
+    password = PasswordField(validators=[validators.required()])
+
+    def validate(self):
+        if super(users_sign_in, self).validate():
+            instance = g.mysql.query(
+                models.user
+            ).filter(
+                models.user.email == self.email.data,
+            ).first()
+            if (
+                instance
+                and
+                hashpw(
+                    self.password.data.encode('utf-8'),
+                    instance.password.encode('utf-8'),
+                ) == instance.password
+            ):
+                session['visitor'] = instance.id
+                return True
+        self.email.errors = ['Invalid Username/Password']
+        self.password.errors = []
+        return False
