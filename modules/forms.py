@@ -3,34 +3,19 @@
 from bcrypt import gensalt, hashpw
 from flask import g, session
 from flask_wtf import Form
-from wtforms.ext.sqlalchemy.fields import (
-    QuerySelectField, QuerySelectMultipleField,
-)
-from wtforms.fields import (
-    PasswordField, SelectField, TextAreaField, TextField,
-)
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
+from wtforms.fields import PasswordField, SelectField, TextAreaField, TextField
 from wtforms.widgets import CheckboxInput
 
-from modules import models
-from modules import validators
-from modules import widgets
+from modules import models, validators, widgets
 
 
 class categories(Form):
     name = TextField(
-        label='Name',
-        validators=[
-            validators.required(),
-            validators.unique(table='categories', columns=[]),
-        ],
+        label='Name', validators=[validators.required(), validators.unique(table='categories', columns=[])],
     )
     ttl = SelectField(
-        choices=models.category.__table__.choices['ttl'],
-        coerce=int,
-        label='TTL',
-        validators=[
-            validators.required(),
-        ]
+        choices=models.category.__table__.choices['ttl'], coerce=int, label='TTL', validators=[validators.required()]
     )
 
     def get_instance(self, category):
@@ -45,30 +30,14 @@ class handles(Form):
         get_label='name',
         label='Neighborhood',
         query_factory=models.get_neighborhoods,
-        validators=[
-            validators.required(),
-        ],
+        validators=[validators.required()],
     )
     screen_name = TextField(
-        label='Screen Name',
-        validators=[
-            validators.required(),
-            validators.unique(table='handles', columns=[]),
-        ],
+        label='Screen Name', validators=[validators.required(), validators.unique(table='handles', columns=[])],
     )
-    name = TextField(
-        label='Name',
-        validators=[
-            validators.required(),
-            validators.unique(table='handles', columns=[]),
-        ],
-    )
+    name = TextField(label='Name', validators=[validators.required(), validators.unique(table='handles', columns=[])])
     profile_image_url = TextField(
-        label='Profile Image URL',
-        validators=[
-            validators.required(),
-            validators.unique(table='handles', columns=[]),
-        ],
+        label='Profile Image URL', validators=[validators.required(), validators.unique(table='handles', columns=[])],
     )
     summary = TextAreaField(
         description=['Enter a brief summary of the handle...'],
@@ -96,10 +65,7 @@ class handles(Form):
 
 
 class neighborhoods(Form):
-    name = TextField(validators=[
-        validators.required(),
-        validators.unique(table='neighborhoods', columns=[]),
-    ])
+    name = TextField(validators=[validators.required(), validators.unique(table='neighborhoods', columns=[])])
 
     def get_instance(self, neighborhood):
         neighborhood.name = self.name.data
@@ -148,12 +114,7 @@ class sign_in(Form):
             if (
                 username == self.username.data
                 and
-                hashpw(
-                    self.password.data.encode('utf-8'),
-                    password.encode('utf-8'),
-                )
-                ==
-                password
+                hashpw(self.password.data.encode('utf-8'), password.encode('utf-8')) == password
             ):
                 session['administrator'] = True
                 return True
@@ -164,9 +125,7 @@ class sign_in(Form):
 
 class visitors(Form):
     email = TextField(validators=[
-        validators.required(),
-        validators.email(),
-        validators.unique(table='visitors', columns=[]),
+        validators.required(), validators.email(), validators.unique(table='visitors', columns=[]),
     ])
 
     def get_instance(self, visitor):
@@ -176,24 +135,17 @@ class visitors(Form):
 
 class users_sign_up(Form):
     email = TextField(
-        validators=[
-            validators.required(),
-            validators.email(),
-            validators.unique(table='users', columns=[])
-        ]
+        validators=[validators.required(), validators.email(), validators.unique(table='users', columns=[])]
     )
     password = PasswordField(validators=[validators.required()])
-    confirm = PasswordField(
-        label='Confirm Password',
-        validators=[validators.required()]
-    )
+    confirm = PasswordField(label='Confirm Password', validators=[validators.required()])
 
     def validate(self):
         if super(users_sign_up, self).validate():
             if self.password.data == self.confirm.data:
                 return True
             self.password.errors = [
-                'password and confirm password are different'
+                'password and confirm password are different',
             ]
             return False
 
@@ -218,10 +170,7 @@ class users_sign_in(Form):
             if (
                 instance
                 and
-                hashpw(
-                    self.password.data.encode('utf-8'),
-                    instance.password.encode('utf-8'),
-                ) == instance.password
+                hashpw(self.password.data.encode('utf-8'), instance.password.encode('utf-8')) == instance.password
             ):
                 session['visitor'] = instance.id
                 return True

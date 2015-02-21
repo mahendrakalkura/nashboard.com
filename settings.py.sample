@@ -20,10 +20,7 @@ USE_X_SENDFILE = False
 
 # MySQL
 
-SQLALCHEMY = (
-    'mysql+mysqldb://%(username)s:%(password)s@%(hostname)s/%(database)s?'
-    'charset=utf8&use_unicode=1'
-) % {
+SQLALCHEMY = 'mysql+mysqldb://%(username)s:%(password)s@%(hostname)s/%(database)s?charset=utf8&use_unicode=1' % {
     'database': '...',
     'hostname': '...',
     'password': '...',

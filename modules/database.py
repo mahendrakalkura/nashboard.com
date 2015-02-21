@@ -17,6 +17,4 @@ engine = create_engine(
     strategy='threadlocal',
 )
 base = declarative_base(bind=engine, metadata=ThreadLocalMetaData())
-session = scoped_session(sessionmaker(
-    autocommit=False, autoflush=False, bind=engine, expire_on_commit=True,
-))
+session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=True))

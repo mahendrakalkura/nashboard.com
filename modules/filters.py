@@ -3,8 +3,7 @@
 from flask_wtf import Form
 from wtforms.fields import SelectField, TextField
 
-from modules import models
-from modules import validators
+from modules import models, validators
 
 
 class handles(Form):
@@ -14,10 +13,7 @@ class handles(Form):
 
     def __init__(self, *args, **kwargs):
         super(handles, self).__init__(*args, **kwargs)
-        self.category.choices = [('', 'All')] + [
-            (category.id, category.name)
-            for category in models.get_categories()
-        ]
+        self.category.choices = [('', 'All')] + [(category.id, category.name) for category in models.get_categories()]
 
     def apply(self, query):
         if self.screen_name.data:
@@ -44,9 +40,7 @@ class handles(Form):
 
 
 class visitors(Form):
-    email = TextField(validators=[
-        validators.required(),
-    ])
+    email = TextField(validators=[validators.required()])
 
     def apply(self, query):
         if self.email.data:

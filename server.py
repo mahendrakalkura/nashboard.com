@@ -13,16 +13,12 @@ from sections import administrators
 from sections import others
 from sections import visitors
 
-application = Flask(
-    __name__, static_folder=join(abspath(dirname(__file__)), 'resources')
-)
+application = Flask(__name__, static_folder=join(abspath(dirname(__file__)), 'resources'))
 application.config.from_pyfile('settings.py')
 application.jinja_env.add_extension('jinja2.ext.do')
 application.jinja_env.add_extension('jinja2.ext.loopcontrols')
 application.jinja_env.add_extension('jinja2.ext.with_')
-application.register_blueprint(
-    administrators.blueprint, url_prefix='/administrators'
-)
+application.register_blueprint(administrators.blueprint, url_prefix='/administrators')
 application.register_blueprint(others.blueprint, url_prefix='/others')
 application.register_blueprint(visitors.blueprint)
 
@@ -55,9 +51,7 @@ assets.register('javascripts', Bundle(
 assets.register('stylesheets', Bundle(
     'vendor/bootstrap3-wysiwyg/dist/bootstrap3-wysihtml5.css',
     'vendor/lightbox2/css/lightbox.css',
-    Bundle(
-        'stylesheets/all.less', filters='less', output='stylesheets/all.css',
-    ),
+    Bundle('stylesheets/all.less', filters='less', output='stylesheets/all.css'),
     filters='cssmin,cssrewrite'if not application.config['DEBUG'] else None,
     output='assets/compressed.css',
 ))
@@ -95,9 +89,7 @@ def errors_500(error=None):
 
 @application.route('/favicon.ico')
 def favicon():
-    return send_from_directory(join(
-        application.root_path, 'resources', 'images'
-    ), 'favicon.ico')
+    return send_from_directory(join(application.root_path, 'resources', 'images'), 'favicon.ico')
 
 
 @application.template_filter('format_integer')

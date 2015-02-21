@@ -4,8 +4,7 @@ from functools import wraps
 
 from flask import g, redirect, request, session, url_for
 
-from modules import log
-from modules import timer
+from modules import log, timer
 
 
 def profile(indent):
@@ -33,7 +32,5 @@ def requires_administrator(function):
             return function(*args, **kwargs)
         if 'administrator' in session:
             del session['administrator']
-        return redirect(url_for(
-            'administrators.sign_in', next=request.url
-        ))
+        return redirect(url_for('administrators.sign_in', next=request.url))
     return decorated_function

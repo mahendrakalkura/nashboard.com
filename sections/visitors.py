@@ -6,26 +6,12 @@ from difflib import SequenceMatcher
 from authomatic.extras.flask import FlaskAuthomatic
 from authomatic.providers import oauth1
 from bleach import linkify
-from flask import (
-    abort,
-    Blueprint,
-    flash,
-    g,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
+from flask import abort, Blueprint, flash, g, redirect, render_template, request, session, url_for
 from pytz import utc
 
-from modules import forms
-from modules import models
-from modules import utilities
+from modules import form, model, utilities
 
-from settings import (
-    DEBUG, SECRET_KEY, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET,
-)
+from settings import DEBUG, SECRET_KEY, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET
 
 blueprint = Blueprint('visitors', __name__)
 
@@ -44,17 +30,11 @@ twitter = FlaskAuthomatic(
 
 @blueprint.before_request
 def before_request():
-    g.categories = g.mysql.query(
-        models.category,
-    ).order_by('position asc').all()
-    g.neighborhoods = g.mysql.query(
-        models.neighborhood,
-    ).order_by('position asc').all()
+    g.categories = g.mysql.query(models.category).order_by('position asc').all()
+    g.neighborhoods = g.mysql.query(models.neighborhood).order_by('position asc').all()
     g.visitor = None
     if 'visitor' in session:
-        g.visitor = g.mysql.query(
-            models.user
-        ).get(session['visitor'])
+        g.visitor = g.mysql.query(models.user).get(session['visitor'])
 
 
 @blueprint.route('/')
@@ -67,21 +47,13 @@ def users_sign_up():
     form = forms.users_sign_up(request.form)
     user = models.user()
     form.id = user.id
-
     if g.visitor:
-        return redirect(
-            request.args.get('next') or url_for('visitors.dashboard')
-        )
-
+        return redirect(request.args.get('next') or url_for('visitors.dashboard'))
     if form.validate_on_submit():
         g.mysql.add(form.get_instance(user))
         g.mysql.commit()
-        flash(
-            'You have successfully Registerd. Please sign in to proceed',
-            'success'
-        )
+        flash('You have successfully Registerd. Please sign in to proceed', 'success')
         return redirect(url_for('visitors.users_sign_in'))
-
     return render_template('visitors/views/users_sign_up.html', form=form)
 
 
@@ -100,22 +72,14 @@ def social_sign_up(provider_id=None):
             ).filter(
                 models.user.twitter_screen_name == twitter.result.user.name,
             ).first():
-                flash(
-                    'You have already Registered.'
-                    'Please sign-in to continue',
-                    'danger'
-                )
+                flash('You have already Registered. Please sign-in to continue', 'danger')
                 return redirect(url_for('visitors.users_sign_in'))
             else:
                 g.mysql.add(models.user(**{
                     'twitter_screen_name': twitter.result.user.name,
                 }))
                 g.mysql.commit()
-                flash(
-                    'You have successfully Registered.'
-                    'Please sign-in to continue',
-                    'success'
-                )
+                flash('You have successfully Registered. Please sign-in to continue', 'success')
                 return redirect(url_for('visitors.users_sign_in'))
             return redirect(url_for('visitors.users_sign_in'))
     else:
@@ -126,16 +90,12 @@ def social_sign_up(provider_id=None):
 def users_sign_in():
     form = forms.users_sign_in(request.form)
     if g.visitor:
-        return redirect(
-            request.args.get('next') or url_for('visitors.dashboard')
-        )
+        return redirect(request.args.get('next') or url_for('visitors.dashboard'))
 
     if request.method == 'POST':
         if form.validate_on_submit():
             flash('You have been signed in successfully.', 'success')
-            return redirect(
-                request.args.get('next') or url_for('visitors.dashboard')
-            )
+            return redirect(request.args.get('next') or url_for('visitors.dashboard'))
         flash('You have not been signed in successfully.', 'danger')
     return render_template('visitors/views/users_sign_in.html', form=form)
 
@@ -157,17 +117,10 @@ def social_sign_in(provider_id=None):
             ).first()
             if instance:
                 session['visitor'] = instance.id
-                flash(
-                    'You have Successfully sign-in',
-                    'success'
-                )
+                flash('You have Successfully sign-in', 'success')
                 return redirect(url_for('visitors.dashboard'))
             else:
-                flash(
-                    'You have Not Registered.'
-                    'Please Register first',
-                    'danger'
-                )
+                flash('You have Not Registered. Please Register first', 'danger')
                 return redirect(url_for('visitors.users_sign_up'))
             return redirect(url_for('visitors.users_sign_in'))
     else:
@@ -188,7 +141,7 @@ def votes():
         models.vote,
     ).filter(
         models.vote.user_id == g.visitor.id,
-        models.vote.tweet_id == request.form['tweet_id']
+        models.vote.tweet_id == request.form['tweet_id'],
     ).first()
     if not vote:
         g.mysql.add(models.vote(**{
@@ -214,9 +167,7 @@ def dashboard_ajax():
     ).filter(
         models.category_handle.category == category,
     )
-    neighborhood = g.mysql.query(
-        models.neighborhood,
-    ).get(request.form['neighborhood_id'])
+    neighborhood = g.mysql.query(models.neighborhood).get(request.form['neighborhood_id'])
     if neighborhood:
         query = query.filter(models.handle.neighborhood_id == neighborhood.id)
     for handle in query.all():
@@ -232,9 +183,7 @@ def dashboard_ajax():
     counts = {}
     tweets = []
     texts = []
-    for tweet in query.order_by(
-        'created_at asc, favorites desc, retweets desc',
-    ):
+    for tweet in query.order_by('created_at asc, favorites desc, retweets desc'):
         total_vote = 0
         vote = None
         if g.visitor:
@@ -242,7 +191,7 @@ def dashboard_ajax():
                 models.vote,
             ).filter(
                 models.vote.user_id == g.visitor.id,
-                models.vote.tweet_id == tweet.id
+                models.vote.tweet_id == tweet.id,
             ).first()
             if vote:
                 vote = vote.direction
@@ -250,52 +199,28 @@ def dashboard_ajax():
                 models.vote,
             ).filter(
                 models.vote.tweet_id == tweet.id,
-                models.vote.direction == 'up'
+                models.vote.direction == 'up',
             ).count()
             number_down_vote = g.mysql.query(
                 models.vote,
             ).filter(
                 models.vote.tweet_id == tweet.id,
-                models.vote.direction == 'down'
+                models.vote.direction == 'down',
             ).count()
-            total_vote = (
-                tweet.retweets
-                +
-                tweet.favorites
-                +
-                number_up_vote
-                -
-                number_down_vote
-            )
-        if (
-            category.name == 'Happy Hours'
-            and
-            not utilities.is_happy_hour(category.name, tweet.text)
-        ):
+            total_vote = tweet.retweets + tweet.favorites + number_up_vote - number_down_vote
+        if category.name == 'Happy Hours' and not utilities.is_happy_hour(category.name, tweet.text):
             continue
-        if (
-            category.name == 'Trivia'
-            and
-            not utilities.is_trivia(category.name, tweet.text)
-        ):
+        if category.name == 'Trivia' and not utilities.is_trivia(category.name, tweet.text):
             continue
         if tweet.user_screen_name not in counts:
             counts[tweet.user_screen_name] = 0
         if counts[tweet.user_screen_name] >= 5:
             continue
-        if (
-            category.name == 'Food & Beverage'
-            or
-            category.name == 'Music'
-        ):
+        if category.name == 'Food & Beverage' or category.name == 'Music':
             text = len(filter(None, tweet.text.split(' ')))
             if text < 7:
                 continue
-            if (
-                tweet.text[0] == '"'
-                or
-                tweet.text[0] == '.'
-            ):
+            if tweet.text[0] == '"' or tweet.text[0] == '.':
                 continue
             count = 0
             for text in texts:
@@ -304,56 +229,42 @@ def dashboard_ajax():
             if count >= 1:
                 continue
             tweets.append({
-                'created_at': tweet.created_at.replace(
-                    tzinfo=utc
-                ).isoformat(' '),
+                'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
                 'favorites': tweet.favorites,
                 'id': tweet.id,
                 'media': tweet.media,
                 'retweets': tweet.retweets,
-                'text': linkify(tweet.text, [
-                    callback,
-                ], parse_email=False, skip_pre=False),
+                'text': linkify(tweet.text, [callback], parse_email=False, skip_pre=False),
+                'total_vote': total_vote,
                 'user_name': tweet.user_name,
                 'user_profile_image_url': tweet.user_profile_image_url,
                 'user_screen_name': tweet.user_screen_name,
                 'vote': vote,
-                'total_vote': total_vote,
             })
             texts.append(tweet.text)
         else:
             tweets.append({
-                'created_at': tweet.created_at.replace(
-                    tzinfo=utc
-                ).isoformat(' '),
+                'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
                 'favorites': tweet.favorites,
                 'id': tweet.id,
                 'media': tweet.media,
                 'retweets': tweet.retweets,
-                'text': linkify(tweet.text, [
-                    callback,
-                ], parse_email=False, skip_pre=False),
+                'text': linkify(tweet.text, [callback], parse_email=False, skip_pre=False),
+                'total_vote': total_vote,
                 'user_name': tweet.user_name,
                 'user_profile_image_url': tweet.user_profile_image_url,
                 'user_screen_name': tweet.user_screen_name,
                 'vote': vote,
-                'total_vote': total_vote,
             })
         counts[tweet.user_screen_name] += 1
     if request.form['data_type'] == 'whathot':
         tweets = sorted(tweets, key=lambda k: k['total_vote'], reverse=False)
-    return render_template(
-        'visitors/views/dashboard_ajax.html', tweets=reversed(tweets),
-    )
+    return render_template('visitors/views/dashboard_ajax.html', tweets=reversed(tweets))
 
 
 @blueprint.route('/handles/<screen_name>')
 def handles(screen_name):
-    handle = g.mysql.query(
-        models.handle,
-    ).filter(
-        models.handle.screen_name == screen_name,
-    ).first()
+    handle = g.mysql.query(models.handle).filter(models.handle.screen_name == screen_name).first()
     if not handle:
         abort(404)
     return render_template('visitors/views/handles.html', handle=handle)
@@ -361,11 +272,7 @@ def handles(screen_name):
 
 @blueprint.route('/handles/<screen_name>/ajax', methods=['POST'])
 def handles_ajax(screen_name):
-    handle = g.mysql.query(
-        models.handle,
-    ).filter(
-        models.handle.screen_name == screen_name,
-    ).first()
+    handle = g.mysql.query(models.handle).filter(models.handle.screen_name == screen_name).first()
     if not handle:
         abort(404)
     query = g.mysql.query(
@@ -377,18 +284,14 @@ def handles_ajax(screen_name):
         models.tweet.created_at <= datetime.now(),
     )
     tweets = []
-    for tweet in query.order_by(
-        'favorites desc, retweets desc, created_at desc'
-    ):
+    for tweet in query.order_by('favorites desc, retweets desc, created_at desc'):
         tweets.append({
             'created_at': tweet.created_at.replace(tzinfo=utc).isoformat(' '),
             'favorites': tweet.favorites,
             'id': tweet.id,
             'media': tweet.media,
             'retweets': tweet.retweets,
-            'text': linkify(tweet.text, [
-                callback,
-            ], parse_email=False, skip_pre=False),
+            'text': linkify(tweet.text, [callback], parse_email=False, skip_pre=False),
             'user_name': tweet.user_name,
             'user_profile_image_url': tweet.user_profile_image_url,
             'user_screen_name': tweet.user_screen_name,
@@ -409,10 +312,7 @@ def stay_in_touch():
             return redirect(url_for('visitors.stay_in_touch'))
         flash('There was a problem..', 'danger')
     if request.args.get('f'):
-        flash(
-            "We're still under development! Check back later for updates!",
-            'warning'
-        )
+        flash("We're still under development! Check back later for updates!", 'warning')
     return render_template('visitors/views/stay_in_touch.html', form=form)
 
 

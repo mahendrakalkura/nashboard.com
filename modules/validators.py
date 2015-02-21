@@ -2,9 +2,7 @@
 
 from flask import g
 from wtforms.compat import string_types
-from wtforms.validators import (
-    DataRequired, Email, StopValidation, ValidationError,
-)
+from wtforms.validators import DataRequired, Email, StopValidation, ValidationError
 
 from modules import database
 
@@ -20,11 +18,7 @@ class required(DataRequired):
     field_flags = ('required', )
 
     def __call__(self, form, field):
-        if (
-            not field.data
-            or
-            (isinstance(field.data, string_types) and not field.data.strip())
-        ):
+        if not field.data or (isinstance(field.data, string_types) and not field.data.strip()):
             field.errors[:] = []
             raise StopValidation('Invalid %(text)s' % {
                 'text': field.label.text,
@@ -43,9 +37,7 @@ class unique(object):
         query = query.filter(getattr(table.c, field.id) == field.data)
         query = query.filter(getattr(table.c, 'id') != form.id)
         for column in self.columns:
-            query = query.filter(
-                getattr(table.c, column) == getattr(form, column)
-            )
+            query = query.filter(getattr(table.c, column) == getattr(form, column))
         if query.count():
             raise ValidationError(u'Duplicate %(label)s' % {
                 'label': field.label.text

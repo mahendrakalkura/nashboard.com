@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+
 from flask import g
 from sqlalchemy.orm import backref, relationship
 
@@ -31,11 +32,10 @@ class category(database.base):
         return ''
 
     def get_position(self):
-        return g.mysql.query('position').from_statement(
-            '''
-            SELECT COALESCE(MAX(position), 0) + 1 AS position
-            FROM categories
-            '''
+        return g.mysql.query(
+            'position',
+        ).from_statement(
+            'SELECT COALESCE(MAX(position), 0) + 1 AS position FROM categories',
         ).one()[0]
 
     def get_tweets(self):
@@ -93,10 +93,7 @@ class neighborhood(database.base):
 
     def get_position(self):
         return g.mysql.query('position').from_statement(
-            '''
-            SELECT COALESCE(MAX(position), 0) + 1 AS position
-            FROM neighborhoods
-            '''
+            'SELECT COALESCE(MAX(position), 0) + 1 AS position FROM neighborhoods'
         ).one()[0]
 
     def set_position(self, direction):
@@ -125,25 +122,15 @@ class handle(database.base):
     }
 
     categories = relationship(
-        'category',
-        backref=backref('handles', lazy='dynamic'),
-        lazy='dynamic',
-        secondary='categories_handles',
+        'category', backref=backref('handles', lazy='dynamic'), lazy='dynamic', secondary='categories_handles',
     )
 
     neighborhood = relationship(
-        'neighborhood',
-        backref=backref(
-            'handles', cascade='all,delete-orphan', lazy='dynamic',
-        ),
+        'neighborhood', backref=backref('handles', cascade='all,delete-orphan', lazy='dynamic'),
     )
 
     def get_tweets_1(self):
-        return g.mysql.query(
-            tweet,
-        ).filter(
-            tweet.user_screen_name == self.screen_name,
-        ).count()
+        return g.mysql.query(tweet).filter(tweet.user_screen_name == self.screen_name).count()
 
     def get_tweets_2(self):
         return g.mysql.query(
@@ -162,18 +149,10 @@ class category_handle(database.base):
     }
 
     category = relationship(
-        'category',
-        backref=backref(
-            'categories_handles', cascade='all,delete-orphan', lazy='dynamic',
-        ),
+        'category', backref=backref('categories_handles', cascade='all,delete-orphan', lazy='dynamic'),
     )
 
-    handle = relationship(
-        'handle',
-        backref=backref(
-            'categories_handles', cascade='all,delete-orphan', lazy='dynamic',
-        ),
-    )
+    handle = relationship('handle', backref=backref('categories_handles', cascade='all,delete-orphan', lazy='dynamic'))
 
 
 class visitor(database.base):

@@ -24,9 +24,7 @@ class list(ListWidget):
                     'left': item.label.text,
                     'right': item(),
                 }
-            html.append(
-                u'<li><label>%(left)s %(right)s</label></li>' % parameters
-            )
+            html.append(u'<li><label>%(left)s %(right)s</label></li>' % parameters)
         html.append(u'</%(tag)s>' % {
             'tag': self.html_tag,
         })

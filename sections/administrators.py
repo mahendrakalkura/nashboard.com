@@ -3,25 +3,9 @@
 from cStringIO import StringIO
 from csv import QUOTE_ALL, writer
 
-from flask import (
-    abort,
-    Blueprint,
-    flash,
-    g,
-    redirect,
-    render_template,
-    request,
-    Response,
-    session,
-    url_for,
-)
+from flask import abort, Blueprint, flash, g, redirect, render_template, request, Response, session, url_for
 
-from modules import classes
-from modules import decorators
-from modules import filters
-from modules import forms
-from modules import models
-from modules import utilities
+from modules import classes, decorators, filters, forms, models,utilities
 
 blueprint = Blueprint('administrators', __name__)
 
@@ -38,9 +22,7 @@ def before_request():
 def dashboard():
     return render_template(
         'administrators/views/dashboard.html',
-        categories=utilities.get_integer(
-            g.mysql.query(models.category).count()
-        ),
+        categories=utilities.get_integer(g.mysql.query(models.category).count()),
         handles=utilities.get_integer(g.mysql.query(models.handle).count()),
         tweets=utilities.get_integer(g.mysql.query(models.tweet).count()),
     )
@@ -51,9 +33,7 @@ def dashboard():
 def categories_overview():
     return render_template(
         'administrators/views/categories_overview.html',
-        categories=g.mysql.query(
-            models.category,
-        ).order_by('position asc').all(),
+        categories=g.mysql.query(models.category).order_by('position asc').all(),
     )
 
 
@@ -71,9 +51,7 @@ def categories_add():
             flash('The category was saved successfully.', 'success')
             return redirect(url_for('administrators.categories_overview'))
         flash('The category was not saved successfully.', 'danger')
-    return render_template(
-        'administrators/views/categories_add.html', form=form,
-    )
+    return render_template('administrators/views/categories_add.html', form=form)
 
 
 @blueprint.route('/categories/<int:id>/edit', methods=['GET', 'POST'])
@@ -91,9 +69,7 @@ def categories_edit(id):
             flash('The category was updated successfully.', 'success')
             return redirect(url_for('administrators.categories_overview'))
         flash('The category was not updated successfully.', 'danger')
-    return render_template(
-        'administrators/views/categories_edit.html', form=form, id=id,
-    )
+    return render_template('administrators/views/categories_edit.html', form=form, id=id)
 
 
 @blueprint.route('/categories/<int:id>/position/<direction>')
@@ -113,9 +89,7 @@ def categories_delete(id):
     if not category:
         abort(404)
     if request.method == 'GET':
-        return render_template(
-            'administrators/views/categories_delete.html', id=id
-        )
+        return render_template('administrators/views/categories_delete.html', id=id)
     if request.method == 'POST':
         g.mysql.delete(category)
         g.mysql.commit()
@@ -133,15 +107,9 @@ def categories_process():
                 for id in ids:
                     g.mysql.delete(g.mysql.query(models.category).get(id))
                     g.mysql.commit()
-                flash(
-                    'The selected categories were deleted successfully.',
-                    'success'
-                )
+                flash('The selected categories were deleted successfully.', 'success')
             else:
-                flash(
-                    'Please select atleast one category and try again.',
-                    'failure'
-                )
+                flash('Please select atleast one category and try again.', 'failure')
     return redirect(url_for('administrators.categories_overview'))
 
 
@@ -150,9 +118,7 @@ def categories_process():
 def neighborhoods_overview():
     return render_template(
         'administrators/views/neighborhoods_overview.html',
-        neighborhoods=g.mysql.query(
-            models.neighborhood,
-        ).order_by('position asc').all(),
+        neighborhoods=g.mysql.query(models.neighborhood).order_by('position asc').all(),
     )
 
 
@@ -166,15 +132,9 @@ def neighborhoods_process():
                 for id in ids:
                     g.mysql.delete(g.mysql.query(models.neighborhood).get(id))
                     g.mysql.commit()
-                flash(
-                    'The selected neighborhoods were deleted successfully.',
-                    'success'
-                )
+                flash('The selected neighborhoods were deleted successfully.', 'success')
             else:
-                flash(
-                    'Please select atleast one neighborhood and try again.',
-                    'failure'
-                )
+                flash('Please select atleast one neighborhood and try again.', 'failure')
     return redirect(url_for('administrators.neighborhoods_overview'))
 
 
@@ -202,9 +162,7 @@ def neighborhoods_add():
             flash('The neighborhood was saved successfully.', 'success')
             return redirect(url_for('administrators.neighborhoods_overview'))
         flash('The neighborhood was not saved successfully.', 'danger')
-    return render_template(
-        'administrators/views/neighborhoods_add.html', form=form,
-    )
+    return render_template('administrators/views/neighborhoods_add.html', form=form)
 
 
 @blueprint.route('/neighborhoods/<int:id>/edit', methods=['GET', 'POST'])
@@ -222,9 +180,7 @@ def neighborhoods_edit(id):
             flash('The neighborhood was updated successfully.', 'success')
             return redirect(url_for('administrators.neighborhoods_overview'))
         flash('The neighborhood was not updated successfully.', 'danger')
-    return render_template(
-        'administrators/views/neighborhoods_edit.html', form=form, id=id,
-    )
+    return render_template('administrators/views/neighborhoods_edit.html', form=form, id=id)
 
 
 @blueprint.route('/neighborhoods/<int:id>/delete', methods=['GET', 'POST'])
@@ -234,9 +190,7 @@ def neighborhoods_delete(id):
     if not neighborhood:
         abort(404)
     if request.method == 'GET':
-        return render_template(
-            'administrators/views/neighborhoods_delete.html', id=id
-        )
+        return render_template('administrators/views/neighborhoods_delete.html', id=id)
     if request.method == 'POST':
         g.mysql.delete(neighborhood)
         g.mysql.commit()
@@ -247,9 +201,7 @@ def neighborhoods_delete(id):
 @blueprint.route('/handles/overview')
 @decorators.requires_administrator
 def handles_overview():
-    (
-        filters_, order_by, limit, page
-    ) = utilities.get_filters_order_by_limit_page(
+    filters_, order_by, limit, page = utilities.get_filters_order_by_limit_page(
         'handles',
         {},
         {
@@ -265,9 +217,7 @@ def handles_overview():
     return render_template(
         'administrators/views/handles_overview.html',
         form=form,
-        handles=query.order_by('%(column)s %(direction)s' % order_by).all()[
-            pager.prefix:pager.suffix
-        ],
+        handles=query.order_by('%(column)s %(direction)s' % order_by).all()[pager.prefix:pager.suffix],
         order_by=order_by,
         pager=pager,
     )
@@ -286,9 +236,7 @@ def handles_add():
             flash('The handle was saved successfully.', 'success')
             return redirect(url_for('administrators.handles_overview'))
         flash('The handle was not saved successfully.', 'danger')
-    return render_template(
-        'administrators/views/handles_add.html', form=form,
-    )
+    return render_template('administrators/views/handles_add.html', form=form)
 
 
 @blueprint.route('/handles/<int:id>/edit', methods=['GET', 'POST'])
@@ -306,9 +254,7 @@ def handles_edit(id):
             flash('The handle was updated successfully.', 'success')
             return redirect(url_for('administrators.handles_overview'))
         flash('The handle was not updated successfully.', 'danger')
-    return render_template(
-        'administrators/views/handles_edit.html', form=form, id=id,
-    )
+    return render_template('administrators/views/handles_edit.html', form=form, id=id)
 
 
 @blueprint.route('/handles/<int:id>/delete', methods=['GET', 'POST'])
@@ -318,9 +264,7 @@ def handles_delete(id):
     if not handle:
         abort(404)
     if request.method == 'GET':
-        return render_template(
-            'administrators/views/handles_delete.html', id=id,
-        )
+        return render_template('administrators/views/handles_delete.html', id=id)
     if request.method == 'POST':
         g.mysql.delete(handle)
         g.mysql.commit()
@@ -341,24 +285,16 @@ def handles_process():
                 for id in ids:
                     g.mysql.delete(g.mysql.query(models.handle).get(id))
                     g.mysql.commit()
-                flash(
-                    'The selected handles were deleted successfully.',
-                    'success'
-                )
+                flash('The selected handles were deleted successfully.', 'success')
             else:
-                flash(
-                    'Please select atleast one handle and try again.',
-                    'failure'
-                )
+                flash('Please select atleast one handle and try again.', 'failure')
     return redirect(url_for('administrators.handles_overview'))
 
 
 @blueprint.route('/visitors/overview', methods=['GET', 'POST'])
 @decorators.requires_administrator
 def visitors_overview():
-    (
-        filters_, order_by, limit, page
-    ) = utilities.get_filters_order_by_limit_page(
+    filters_, order_by, limit, page = utilities.get_filters_order_by_limit_page(
         'visitors',
         {},
         {
@@ -376,9 +312,7 @@ def visitors_overview():
         form=form,
         order_by=order_by,
         pager=pager,
-        visitors=query.order_by('%(column)s %(direction)s' % order_by).all()[
-            pager.prefix:pager.suffix
-        ],
+        visitors=query.order_by('%(column)s %(direction)s' % order_by).all()[pager.prefix:pager.suffix],
     )
 
 
@@ -425,9 +359,9 @@ def visitors_export():
             visitor.timestamp.isoformat(' '),
         ]
         for visitor in filters.visitors(
-            **filters_
+            **filters_,
         ).apply(
-            g.mysql.query(models.visitor)
+            g.mysql.query(models.visitor),
         ).order_by('timestamp desc').all()
     ])
     return Response(
@@ -442,11 +376,10 @@ def visitors_export():
 @blueprint.route('/profile', methods=['GET', 'POST'])
 @decorators.requires_administrator
 def profile():
-    form = forms.profile(request.form, username=g.mysql.query(
-        models.setting,
-    ).filter(
-        models.setting.key == 'username',
-    ).first().value)
+    form = forms.profile(
+        request.form,
+        username=g.mysql.query(models.setting).filter(models.setting.key == 'username').first().value,
+    )
     if request.method == 'POST':
         if form.validate_on_submit():
             form.persist()
@@ -459,16 +392,12 @@ def profile():
 @blueprint.route('/sign-in', methods=['GET', 'POST'])
 def sign_in():
     if g.administrator:
-        return redirect(
-            request.args.get('next') or url_for('administrators.dashboard')
-        )
+        return redirect(request.args.get('next') or url_for('administrators.dashboard'))
     form = forms.sign_in(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
             flash('You have been signed in successfully.', 'success')
-            return redirect(
-                request.args.get('next') or url_for('administrators.dashboard')
-            )
+            return redirect(request.args.get('next') or url_for('administrators.dashboard'))
         flash('You have not been signed in successfully.', 'danger')
     return render_template('administrators/views/sign_in.html', form=form)
 

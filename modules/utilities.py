@@ -69,11 +69,7 @@ def set_filters(table, form):
 def set_order_by_limit_page(table):
     if table not in session:
         session[table] = {}
-    if(
-        'order_by_column' in request.args
-        and
-        'order_by_direction' in request.args
-    ):
+    if 'order_by_column' in request.args and 'order_by_direction' in request.args:
         session[table]['order_by'] = {
             'column': request.args['order_by_column'],
             'direction': request.args['order_by_direction'],
