@@ -24,13 +24,13 @@ SQLALCHEMY = (
     'mysql+mysqldb://%(username)s:%(password)s@%(hostname)s/%(database)s?'
     'charset=utf8&use_unicode=1'
 ) % {
-    'database': '',
-    'hostname': '',
-    'password': '',
-    'username': '',
+    'database': '...',
+    'hostname': '...',
+    'password': '...',
+    'username': '...',
 }
 
 # TWITTER
 
-CONSUMER_KEY = ''
-CONSUMER_SECRET = ''
+TWITTER_CONSUMER_KEY = '...'
+TWITTER_CONSUMER_SECRET = '...'

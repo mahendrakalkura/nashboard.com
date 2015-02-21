@@ -15,7 +15,7 @@ from flask import (
     render_template,
     request,
     session,
-    url_for
+    url_for,
 )
 from pytz import utc
 
@@ -23,7 +23,9 @@ from modules import forms
 from modules import models
 from modules import utilities
 
-import settings
+from settings import (
+    DEBUG, SECRET_KEY, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET,
+)
 
 blueprint = Blueprint('visitors', __name__)
 
@@ -31,12 +33,12 @@ twitter = FlaskAuthomatic(
     config={
         'twitter': {
             'class_': oauth1.Twitter,
-            'consumer_key': settings.CONSUMER_KEY,
-            'consumer_secret': settings.CONSUMER_SECRET,
+            'consumer_key': CONSUMER_KEY,
+            'consumer_secret': CONSUMER_SECRET,
         },
     },
-    secret=settings.SECRET_KEY,
-    debug=True,
+    debug=DEBUG,
+    secret=SECRET_KEY,
 )
 
 

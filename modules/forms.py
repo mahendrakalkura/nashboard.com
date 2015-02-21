@@ -7,10 +7,7 @@ from wtforms.ext.sqlalchemy.fields import (
     QuerySelectField, QuerySelectMultipleField,
 )
 from wtforms.fields import (
-    PasswordField,
-    SelectField,
-    TextAreaField,
-    TextField,
+    PasswordField, SelectField, TextAreaField, TextField,
 )
 from wtforms.widgets import CheckboxInput
 
