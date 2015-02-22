@@ -9,27 +9,25 @@
         data-url-vote="{{ url_for('visitors.dashboard_vote') }}"
         ng-controller="dashboard"
         >
-        {% if g.user %}
-            <div class="clearfix">
-                <p class="btn-group pull-right">
-                    <label
-                        class="btn btn-default"
-                        ng-class="{active: mode == 'real_time'}"
-                        ng-click="mode = 'real_time'"
-                        >
-                        Real Time
-                    </label>
-                    <label
-                        class="btn btn-default"
-                        ng-class="{active: mode == 'whats_hot'}"
-                        ng-click="mode = 'whats_hot'"
-                        >
-                        What's Hot
-                    </label>
-                </p>
-            </div>
-            <hr>
-        {% endif %}
+        <div class="clearfix">
+            <p class="btn-group pull-right">
+                <label
+                    class="btn btn-default"
+                    ng-class="{active: mode == 'real_time'}"
+                    ng-click="mode = 'real_time'"
+                    >
+                    Real Time
+                </label>
+                <label
+                    class="btn btn-default"
+                    ng-class="{active: mode == 'whats_hot'}"
+                    ng-click="mode = 'whats_hot'"
+                    >
+                    What's Hot
+                </label>
+            </p>
+        </div>
+        <hr>
         <div id="tweets">
             <div ng-repeat="tweet in tweets" tweet="tweet">
                 <div
@@ -43,20 +41,16 @@
                         </a>
                         <a class="user_screen_name" href="[! tweet.url !]" target="_blank">[! tweet.user_name !]</a>
                         <p class="created_at" title="[! tweet.created_at !]">[! tweet.created_at !]</p>
-                        <div ng-show="!tweet.vote">
-                            <div class="vote">
-                                <div ng-click="vote(tweet, 'up')">
-                                    <a class="btn btn-sm">
-                                        <i class="fa fa-arrow-up"></i>
-                                    </a>
-                                </div>
-                                <div ng-click="vote(tweet, 'down')">
-                                    <a class="btn btn-sm">
-                                        <i class="fa fa-arrow-down"></i>
-                                    </a>
-                                </div>
+                        {% if g.user %}
+                            <div class="vote" ng-show="!tweet.vote">
+                                <a class="btn btn-default btn-xs" ng-click="vote(tweet, 'up')">
+                                    <i class="fa fa-arrow-up"></i>
+                                </a>
+                                <a class="btn btn-default btn-xs" ng-click="vote(tweet, 'down')">
+                                    <i class="fa fa-arrow-down"></i>
+                                </a>
                             </div>
-                        </div>
+                        {% endif %}
                     </div>
                     <div class="col-sm-7 part body">
                         <p class="text" ng-bind-html="tweet.text|html"></p>

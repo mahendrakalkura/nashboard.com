@@ -64,17 +64,20 @@
                         </select>
                         {% if g.user %}
                             <div class="btn-group">
-                                <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">
+                                <a class="dropdown-toggle" data-toggle="dropdown">
                                     {% if g.user.twitter_screen_name %}
                                         {{ g.user.twitter_screen_name }}
                                     {% else %}
                                         {{ g.user.email }}
                                     {% endif %}
                                     <span class="caret"></span>
-                                </button>
+                                </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a href="{{ url_for('visitors.users_sign_out') }}">Sign Out</a>
+                                        <a href="{{ url_for('visitors.users_sign_out') }}">
+                                            <i class="fa fa-sign-out"></i>
+                                            Sign Out
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
