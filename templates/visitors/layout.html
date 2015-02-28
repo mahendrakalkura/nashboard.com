@@ -89,7 +89,7 @@
                     <div class="bottom collapse navbar-collapse" id="actual-navbar">
                         <ul class="nav navbar-nav">
                             {% for category in g.categories %}
-                                <li>
+                                <li class="{{ 'active' if category.id == category_id else '' }}">
                                     <a href="{{ url_for('visitors.dashboard', category_id=category.id) }}">
                                         {{ category.name }}
                                     </a>
