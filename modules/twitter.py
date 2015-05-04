@@ -106,6 +106,7 @@ def get_tweets(q):
             break
         if not response.status_code == 200:
             break
+        contents = None
         try:
             contents = loads(response.text)
         except (JSONDecodeError, TypeError, ValueError):
@@ -183,7 +184,7 @@ def get_tweet(tweet):
         pass
     try:
         text = tweet.xpath(
-            './/div[@class="content"]/p[@class="js-tweet-text tweet-text"]'
+            './/div[@class="content"]/p[@class="TweetTextSize  js-tweet-text tweet-text"]'
         ).xpath(
             'string()'
         ).extract()[0].strip()
