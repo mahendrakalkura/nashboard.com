@@ -69,7 +69,6 @@ def get_tweets(q):
         'interval': '30000',
         'latent_count': '0',
         'q': q,
-        'scroll_cursor': '',
         'src': 'typd',
     }
     url = 'https://twitter.com/i/search/timeline'
